@@ -5,7 +5,7 @@ summary: ""
 date: 2024-08-14T13:44:13+03:00
 lastmod: 2024-08-14T13:44:13+03:00
 draft: false
-weight: 140
+weight: 990
 toc: true
 seo:
   title: "" # custom title (optional)
@@ -18,11 +18,12 @@ seo:
 
 ```sh
 kubectl config set-context --current --namespace=nuodb-cp-system
-kubectl get databases.cp.nuodb.com -o name | xargs kubectl delete
-kubectl get domains.cp.nuodb.com -o name | xargs kubectl delete
-kubectl get servicetiers.cp.nuodb.com -o name | xargs kubectl delete
-kubectl get helmfeatures.cp.nuodb.com -o name | xargs kubectl delete
-kubectl get databasequotas.cp.nuodb.com -o name | xargs -r kubectl delete
+for crd in $(kubectl get customresourcedefinitions --no-headers -o custom-columns=":metadata.name" | grep ".cp.nuodb.com"); do
+    kubectl get $crd -o name -n "${ns}" | xargs -r kubectl delete -n "${ns}" --wait=false
+done
+for crd in $(kubectl get customresourcedefinitions --no-headers -o custom-columns=":metadata.name" | grep ".cp.nuodb.com"); do
+    kubectl get $crd -o name -n "${ns}" | xargs -r kubectl delete -n "${ns}"
+done
 kubectl get secrets -o name --selector=cp.nuodb.com/organization | xargs -r kubectl delete
 kubectl get pvc -o name --selector=group=nuodb | xargs -r kubectl delete
 ```
@@ -33,12 +34,14 @@ kubectl get pvc -o name --selector=group=nuodb | xargs -r kubectl delete
 helm uninstall nuodb-cp-rest --namespace nuodb-cp-system
 helm uninstall nuodb-cp-operator --namespace nuodb-cp-system
 helm uninstall nuodb-cp-crd --namespace nuodb-cp-system
+helm uninstall ingress-nginx --namespace nginx
 helm uninstall cert-manager --namespace cert-manager
 ```
 
-- Delete the provisioned namespace:
+- Delete the provisioned namespaces:
 
 ```sh
 kubectl delete namespace nuodb-cp-system
 kubectl delete namespace cert-manager
+kubectl delete namespace nginx
 ```

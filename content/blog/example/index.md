@@ -4,7 +4,7 @@ description: "Just an example post."
 summary: "You can use blog posts for announcing product updates and features."
 date: 2023-09-07T16:27:22+02:00
 lastmod: 2023-09-07T16:27:22+02:00
-draft: false
+draft: true
 weight: 50
 categories: []
 tags: []

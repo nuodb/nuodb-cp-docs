@@ -14,6 +14,8 @@ seo:
   noindex: false # false (default) or true
 ---
 
+NuoDB Control Plane allows users to provision NuoDB databases on-demand remotely using REST services by exposing various predefined configuration options.
+
 This document describes how to provision NuoDB databases in multi-tenancy model by using NuoDB Control Plane (CP).
 NuoDB Control Plane works with [Kubernetes][1] locally or in the cloud.
 The steps in this guide can be followed regardless of the selected Kubernetes platform provider.
@@ -42,15 +44,66 @@ Install Cert Manager Helm chart.
 ```sh
 helm upgrade --install cert-manager jetstack/cert-manager \
   --namespace cert-manager \
-  --set installCRDs=true \
-  --create-namespace
+  --create-namespace \
+  --wait \
+  --set installCRDs=true
 ```
 
-Wait for Cert Manager to become available.
+### Install Ingress Controller
+
+NuoDB supports [external access](https://github.com/nuodb/nuodb-helm-charts/blob/master/docs/HowToConnectExternally.md) to clients from outside Kubernetes clusters.
+The NuoDB Control Plane (CP) can be configured to allow external connections to the REST service to create domains and databases.
+It configures databases with external access also, providing connection details for each database.
+
+NuoDB CP supports [Ingress Nginx](https://kubernetes.github.io/ingress-nginx) and [HAProxy](https://github.com/haproxytech/kubernetes-ingress) ingress controllers.
+The SSL-passthrough feature is used to expose and multiplex SQL database connectivity.
+
+Add the official Ingress Nginx Helm repositories.
 
 ```sh
-kubectl -n cert-manager wait pod --all --for=condition=Ready
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
 ```
+
+Install Ingress Nginx Controller.
+
+```sh
+helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
+  --namespace nginx \
+  --create-namespace \
+  --set controller.ingressClassResource.default=true \
+  --set controller.service.enablePorts.http=false \
+  --set controller.admissionWebhooks.certManager.enabled=true \
+  --set controller.extraArgs.default-ssl-certificate="nginx/ingress-nginx-default-cert" \
+  --set controller.extraArgs.enable-ssl-passthrough=true \
+  --set controller.service.type=NodePort # Enables connecting to databases with port-forwarding
+```
+
+Generate TLS certificates for Ingress Controller.
+
+```sh
+kubectl apply -f - <<EOF
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ingress-nginx-default-cert
+  namespace: nginx
+spec:
+  commonName: dbaas.localtest.me
+  duration: 8760h
+  issuerRef:
+    name: ingress-nginx-self-signed-issuer
+  secretName: ingress-nginx-default-cert
+  subject:
+    organizations:
+    - ingress-nginx
+EOF
+```
+
+{{< callout context="caution" title="Caution" icon="outline/alert-triangle" >}}
+Self-signed certificates should be used for local testing purposes only.
+For more information on how to configure Nginx controller with TLS, see [Ingress Nginx TLS User Guide](https://github.com/kubernetes/ingress-nginx/blob/main/docs/user-guide/tls.md).
+{{< /callout >}}
 
 ## Installing NuoDB Control Plane
 
@@ -59,8 +112,11 @@ The NuoDB Control Plane consists of [Custom Resource Definitions][5] and the fol
 - *NuoDB CP Operator*, which enforces the desired state of the NuoDB [custom resources][6].
 - *NuoDB CP REST service*, that exposes a REST API allowing users to manipulate and inspect DBaaS entities.
 
-By default the NuoDB CP will operate in a single namespace only which will be used for NuoDB CP and all databases created by it.
 The databases are grouped into *projects*, which are themselves grouped into *organizations*.
+
+{{< callout context="note" title="Note" icon="outline/info-circle" >}}
+By default the NuoDB CP will operate in a single namespace only which will be used for NuoDB CP and all databases created by it.
+{{< /callout >}}
 
 Add the official Helm repositories.
 
@@ -71,28 +127,26 @@ helm repo update
 
 Install NuoDB CP Helm charts.
 
-```sh
+```sh {title="Install DBaaS CRDs"}
 helm upgrade --install nuodb-cp-crd nuodb-cp/nuodb-cp-crd \
     --namespace nuodb-cp-system \
     --create-namespace
-
-helm upgrade --install nuodb-cp-operator nuodb-cp/nuodb-cp-operator \
-    --namespace nuodb-cp-system \
-    --set cpOperator.webhooks.enabled=true \
-    --set 'cpOperator.extraArgs[0]=--ingress-https-port=48006' # Enables connecting to databases with port-forwarding
-
-helm upgrade --install nuodb-cp-rest nuodb-cp/nuodb-cp-rest \
-    --namespace nuodb-cp-system \
-    --set cpRest.authentication.enabled=true \
-    --set cpRest.authentication.admin.create=true \
-    --set cpRest.baseDomainName=dbaas.localtest.me # Enables connecting to databases with port-forwarding
 ```
 
-Wait for NuoDB Control Plane to become available.
+```sh {title="Install DBaaS operator"}
+helm upgrade --install nuodb-cp-operator nuodb-cp/nuodb-cp-operator \
+    --namespace nuodb-cp-system \
+    --wait \
+    --set cpOperator.webhooks.enabled=true \
+    --set 'cpOperator.extraArgs[0]=--ingress-https-port=8443' # Enables connecting to databases with port-forwarding
+```
 
-```sh
-kubectl -n nuodb-cp-system -l app=nuodb-cp-operator wait pod --all --for=condition=Ready
-kubectl -n nuodb-cp-system -l app=nuodb-cp-rest wait pod --all --for=condition=Ready
+```sh {title="Install DBaaS REST service"}
+helm upgrade --install nuodb-cp-rest nuodb-cp/nuodb-cp-rest \
+    --namespace nuodb-cp-system \
+    --wait \
+    --set cpRest.ingress.enabled=true \
+    --set "cpRest.baseDomainName=dbaas.localtest.me" # Enables connecting to databases with port-forwarding
 ```
 
 [1]: https://kubernetes.io/docs/home/

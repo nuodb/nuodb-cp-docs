@@ -5,7 +5,7 @@ summary: ""
 date: 2024-08-14T13:40:00+03:00
 lastmod: 2024-08-14T13:40:00+03:00
 draft: false
-weight: 130
+weight: 140
 toc: true
 seo:
   title: "" # custom title (optional)
@@ -14,23 +14,37 @@ seo:
   noindex: false # false (default) or true
 ---
 
-This guide will use port forwarding to connect to the NuoDB database.
+Database SQL connections are going through the Ingress controller and requires TLS to be enabled on NuoDB database.
+
+{{< tabs "connect-database" >}}
+{{< tab "nuodb-cp" >}}
 
 ```sh
-ADMIN_SVC=$(kubectl get svc -n nuodb-cp-system \
-    -l 'cp.nuodb.com/organization=acme,cp.nuodb.com/project=messaging,!cp.nuodb.com/database' -oname | grep "clusterip")
-DB_SVC=$(kubectl get svc -n nuodb-cp-system \
-    -l "cp.nuodb.com/organization=acme,cp.nuodb.com/project=messaging,cp.nuodb.com/database" -oname)
-kubectl port-forward -n nuodb-cp-system $ADMIN_SVC 48004 2>&1 >/dev/null &
-kubectl port-forward -n nuodb-cp-system $DB_SVC 48006 2>&1 >/dev/null &
+nuodb-cp database connect acme/messaging/demo \
+  --ingress-port 8443 \
+  --db-user=dba \
+  --db-password=changeIt
 ```
 
-Connect to the NuoDB database via `nuosql` (requires [nuodb-client][8] package v20230228 or later).
+{{< /tab >}}
+{{< tab "nuosql" >}}
+
+Get database connection information.
 
 ```sh
-CA_CERT="$(curl -s -u "system/admin:$PASS" $BASE_URL/databases/acme/messaging/demo | jq -r '.status.caPem')"
-DB_URL="$(curl -s -u "system/admin:$PASS" $BASE_URL/databases/acme/messaging/demo | jq -r '.status.sqlEndpoint')"
-nuosql "demo@${DB_URL}" --user dba --password secret --connection-property trustedCertificates="$CA_CERT"
+CA_CERT="$(curl $NUODB_CP_URL_BASE/databases/acme/messaging/demo | jq -r '.status.caPem')"
+DB_URL="$(curl $NUODB_CP_URL_BASE/databases/acme/messaging/demo | jq -r '.status.sqlEndpoint')"
 ```
 
-[8]: https://github.com/nuodb/nuodb-client/releases
+Connect using `nuosql`.
+
+```sh
+nuosql "demo@${DB_URL}:8443" --user dba --password changeIt --connection-property trustedCertificates="$CA_CERT"
+```
+
+[NuoDB client](https://github.com/nuodb/nuodb-client/releases) package v20230228 or later is required to connect to DBaaS database.
+
+{{< /tab >}}
+{{< /tabs >}}
+
+
