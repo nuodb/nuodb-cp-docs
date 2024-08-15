@@ -16,10 +16,6 @@ seo:
 
 This section describes how to connect to NuoDB Control Plane REST service via CLI tools.
 
-{{< callout context="tip" title="Check out" icon="outline/rocket" >}}
-For more information on the available services, see [REST API reference](docs/reference/rest-api-reference/).
-{{< /callout >}}
-
 ## Prerequisites
 
 - [nuodb-cp](https://github.com/nuodb/nuodb-cp-releases/releases/latest/download/nuodb-cp) or [cURL](https://curl.se/download.html)

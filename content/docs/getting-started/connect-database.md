@@ -21,7 +21,6 @@ Database SQL connections are going through the Ingress controller and requires T
 
 ```sh
 nuodb-cp database connect acme/messaging/demo \
-  --ingress-port 8443 \
   --db-user=dba \
   --db-password=changeIt
 ```
@@ -46,5 +45,3 @@ nuosql "demo@${DB_URL}:8443" --user dba --password changeIt --connection-propert
 
 {{< /tab >}}
 {{< /tabs >}}
-
-
