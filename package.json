@@ -1,9 +1,9 @@
 {
   "name": "nuodb-cp-docs",
-  "version": "0.0.0",
-  "description": "Doks theme",
-  "author": "Hyas",
-  "license": "MIT",
+  "version": "0.0.1",
+  "description": "NuoDB Control Plane documentation",
+  "author": "NuoDB",
+  "license": "BSD-3-Clause",
   "scripts": {
     "create": "hugo new",
     "dev": "hugo server --disableFastRender --noHTTPCache",

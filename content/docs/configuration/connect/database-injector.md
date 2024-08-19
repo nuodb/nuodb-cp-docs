@@ -24,7 +24,7 @@ This document describes how to use database injector to supply database connecti
 
 ## Installing NuoDB Control Plane
 
-Install NuoDB CP as documented in [Installation](../README.md#installation) section.
+Install NuoDB CP as documented in [Deployment]({{<ref "../../getting-started/installation.md">}}) section.
 
 ### Enable Cluster-scoped Access
 

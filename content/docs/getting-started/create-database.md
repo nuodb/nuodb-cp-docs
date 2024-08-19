@@ -17,7 +17,7 @@ seo:
 Once the Control Plane is deployed, projects and databases can now be created.
 
 {{< callout context="tip" title="Check out" icon="outline/rocket" >}}
-For more information on the available services, see [REST API reference](docs/reference/rest-api-reference/).
+For more information on the available services, see [REST API reference]({{< ref "../reference/rest-api.md" >}}).
 {{< /callout >}}
 
 ## Create Project
