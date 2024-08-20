@@ -14,8 +14,8 @@ seo:
   noindex: false # false (default) or true
 ---
 
-NuoDB Control Plane (CP) can be used to create NuoDB databases for applications that are running in the same [Kubernetes][1] cluster.
-This document describes how to use database injector to supply database connection information to sample YCSB application.
+The NuoDB Control Plane (CP) is used to create NuoDB databases for applications that are running in the same [Kubernetes][1] cluster.
+This document describes how to use the database injector to supply database connection information to a sample YCSB application.
 
 ## Prerequisites
 
@@ -24,7 +24,7 @@ This document describes how to use database injector to supply database connecti
 
 ## Installing NuoDB Control Plane
 
-Install NuoDB CP as documented in [Deployment]({{<ref "../../getting-started/installation.md">}}) section.
+Install NuoDB CP as documented in the [Deployment]({{< ref "../../getting-started/installation.md" >}}) section.
 
 ### Enable Cluster-scoped Access
 
@@ -42,9 +42,9 @@ helm install nuodb-cp-operator nuodb-cp/nuodb-cp-operator \
 
 {{< callout context="note" title="Note" icon="outline/info-circle" >}}
 The `nuodb` service account (SA) creation is disabled in the above command for simplicity.
-To enable NuoDB Kubernetes Aware Admin (KAA) capabilities, the NuoDB processes should be given special permissions to access Kubernetes API server.
-For more information, please check [Automatic Management of NuoDB State](https://doc.nuodb.com/nuodb/latest/deployment-models/kubernetes-environments/kubernetes-aware-admin/).
-For cluster-scoped deployments, the NuoDB SA and RBAC should be provisioned before hand in each namespace where NuoDB databases are created.
+To enable NuoDB Kubernetes Aware Admin (KAA) capabilities, give the NuoDB processes special permissions to access the Kubernetes API server.
+For more information, please see [Automatic Management of NuoDB State](https://doc.nuodb.com/nuodb/latest/deployment-models/kubernetes-environments/kubernetes-aware-admin/).
+For cluster-scoped deployments, provision the NuoDB SA and RBAC beforehand in each namespace where NuoDB databases will be created.
 {{< /callout >}}
 
 ## Database Injection

@@ -16,9 +16,9 @@ seo:
 
 NuoDB Control Plane allows users to provision NuoDB databases on-demand remotely using REST services by exposing various predefined configuration options.
 
-This document describes how to provision NuoDB databases in multi-tenancy model by using NuoDB Control Plane (CP).
-NuoDB Control Plane works with [Kubernetes][1] locally or in the cloud.
-The steps in this guide can be followed regardless of the selected Kubernetes platform provider.
+This document describes how to provision NuoDB databases in a multi-tenant model by using the NuoDB Control Plane (CP).
+The NuoDB Control Plane works with [Kubernetes][1] locally or in the cloud.
+Follow the steps in this guide regardless of the selected Kubernetes platform provider.
 
 ## Prerequisites
 
@@ -26,11 +26,11 @@ The steps in this guide can be followed regardless of the selected Kubernetes pl
 - [kubectl][3] installed and able to access the cluster.
 - [Helm 3.x][4] installed.
 
-## Installing Dependencies
+## Software Dependency Installation
 
 ### Install Cert Manager
 
-To enable [admission webhooks][7] in the NuoDB operator, [cert-manager](https://github.com/cert-manager/cert-manager) must be installed to automatically generate certificates for the webhook server.
+To enable [admission webhooks][7] in the NuoDB operator, install [cert-manager](https://github.com/cert-manager/cert-manager) to automatically generate certificates for the webhook server.
 
 Add the official Helm repositories.
 
@@ -51,7 +51,7 @@ helm upgrade --install cert-manager jetstack/cert-manager \
 
 ### Install Ingress Controller
 
-NuoDB supports [external access](https://github.com/nuodb/nuodb-helm-charts/blob/master/docs/HowToConnectExternally.md) to clients from outside Kubernetes clusters.
+NuoDB databases support [external access](https://github.com/nuodb/nuodb-helm-charts/blob/master/docs/HowToConnectExternally.md) from clients that are outside of Kubernetes cluster.
 The NuoDB Control Plane (CP) can be configured to allow external connections to the REST service to create domains and databases.
 It configures databases with external access also, providing connection details for each database.
 
@@ -109,10 +109,10 @@ For more information on how to configure Nginx controller with TLS, see [Ingress
 
 The NuoDB Control Plane consists of [Custom Resource Definitions][5] and the following workloads:
 
-- *NuoDB CP Operator*, which enforces the desired state of the NuoDB [custom resources][6].
-- *NuoDB CP REST service*, that exposes a REST API allowing users to manipulate and inspect DBaaS entities.
+- The *NuoDB CP Operator*, which enforces the desired state of the NuoDB [custom resources][6].
+- The *NuoDB CP REST service*, that exposes a REST API allowing users to manipulate and inspect DBaaS entities.
 
-The databases are grouped into *projects*, which are themselves grouped into *organizations*.
+Databases are grouped into *projects*, which are themselves grouped into *organizations*.
 
 {{< callout context="note" title="Note" icon="outline/info-circle" >}}
 By default the NuoDB CP will operate in a single namespace only which will be used for NuoDB CP and all databases created by it.

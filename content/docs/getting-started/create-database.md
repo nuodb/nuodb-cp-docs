@@ -14,7 +14,7 @@ seo:
   noindex: false # false (default) or true
 ---
 
-Once the Control Plane is deployed, projects and databases can now be created.
+Once the Control Plane is deployed, projects and databases can be created.
 
 {{< callout context="tip" title="Check out" icon="outline/rocket" >}}
 For more information on the available services, see [REST API reference]({{< ref "../reference/rest-api.md" >}}).
@@ -46,13 +46,13 @@ curl -X PUT -H 'Content-Type: application/json' \
 {{< /tabs >}}
 
 {{< callout context="note" title="Note" icon="outline/info-circle" >}}
-Creating project and database with `n0.small` service tier will require 3 vCPU and 5Gi RAM allocatable resources from your cluster.
-If your setup is resource constrained, consider using `n0.nano` service tier.
+Creating project and database with `n0.small` service tier requires 3 vCPUs and 5Gi of RAM.
+If your environment is resource constrained, consider using the `n0.nano` service tier.
 {{< /callout >}}
 
 ## Create database
 
-Create a new database *demo* in project *messaging*:
+Create a new database *demo* in the *messaging* project.
 
 {{< tabs "create-new-database" >}}
 {{< tab "nuodb-cp" >}}

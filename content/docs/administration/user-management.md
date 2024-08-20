@@ -14,7 +14,7 @@ seo:
   noindex: false # false (default) or true
 ---
 
-This document describes how to create and manage users and control their access privileges.
+This document describes how to create and manage users and configure user access privileges.
 
 ## API concepts
 

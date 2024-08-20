@@ -14,7 +14,7 @@ seo:
   noindex: false # false (default) or true
 ---
 
-This section describes how to connect to NuoDB Control Plane REST service via CLI tools.
+This section describes how to connect to the NuoDB Control Plane REST service via CLI tools.
 
 ## Prerequisites
 
@@ -52,7 +52,7 @@ It is recommended to create less privileged users after installation.
 For more information, see [User Management and Access Control]({{< ref "../administration/user-management.md" >}}).
 {{< /callout >}}
 
-If Nginx TLS certificate in not signed by public CA, `nuodb-cp` must configured to trust it.
+If the Nginx TLS certificate is not signed by a public CA, configure `nuodb-cp` to trust it.
 
 ```sh
 kubectl get secret ingress-nginx-default-cert -n nginx -o jsonpath='{.data.ca\.crt}' | base64 -d > /tmp/ingress.pem

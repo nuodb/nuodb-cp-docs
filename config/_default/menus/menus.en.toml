@@ -11,7 +11,7 @@
   url = "/tutorial/lorem/"
 
 [[main]]
-  name = "Docs"
+  name = "Documentation"
   url = "/docs/getting-started/deploy-nuodb-control-plane/"
   weight = 10
 

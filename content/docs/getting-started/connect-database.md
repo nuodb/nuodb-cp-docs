@@ -14,7 +14,7 @@ seo:
   noindex: false # false (default) or true
 ---
 
-Database SQL connections are going through the Ingress controller and requires TLS to be enabled on NuoDB database.
+Database SQL clients connect through the Ingress controller and require TLS to be enabled on the NuoDB database.
 
 {{< tabs "connect-database" >}}
 {{< tab "nuodb-cp" >}}
@@ -45,3 +45,21 @@ nuosql "demo@${DB_URL}:8443" --user dba --password changeIt --connection-propert
 
 {{< /tab >}}
 {{< /tabs >}}
+
+### Quick links
+
+{{< card-grid >}}
+{{< card title="Client Development" icon="outline/book" color="yellow" >}}
+
+- [NuoDB Drivers](https://doc.nuodb.com/nuodb/latest/client-development/nuodb-drivers/)
+- [Samples](https://doc.nuodb.com/nuodb/latest/client-development/sample-nuodb-programs-on-github/)
+
+{{< /card >}}
+{{< card title="SQL Development" icon="outline/database" color="purple" >}}
+
+- [Using NuoDB SQL CLI](https://doc.nuodb.com/nuodb/latest/sql-development/using-nuodb-sql-command-line/)
+- [SQL Statements](https://doc.nuodb.com/nuodb/latest/reference-information/sql-language/sql-statements/)
+- [SQL Procedures, Functions, Triggers](https://doc.nuodb.com/nuodb/latest/sql-development/sql-procedures-functions-and-triggers/)
+
+{{< /card >}}
+{{< /card-grid >}}
