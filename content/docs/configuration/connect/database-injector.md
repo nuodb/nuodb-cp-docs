@@ -70,8 +70,8 @@ NuoDB domain and database resources can be created either via REST API or declar
 This example creates NuoDB domain and database using custom resources.
 
 ```sh
-kubectl apply -f https://raw.githubusercontent.com/nuodb/nuodb-cp-releases/main/docs/files/domain.yaml
-kubectl apply -f https://raw.githubusercontent.com/nuodb/nuodb-cp-releases/main/docs/files/database.yaml
+kubectl apply -f https://nuodb.github.io/nuodb-cp-docs/static/samples/domain.yaml
+kubectl apply -f https://nuodb.github.io/nuodb-cp-docs/static/samples/database.yaml
 ```
 
 ## Creating Sample Application
@@ -79,7 +79,7 @@ kubectl apply -f https://raw.githubusercontent.com/nuodb/nuodb-cp-releases/main/
 Create a sample Yahoo! Cloud Serving Benchmark (YCSB) application and reference the database information into the _app_ container.
 
 ```sh
-kubectl apply -f https://raw.githubusercontent.com/nuodb/nuodb-cp-releases/main/docs/files/ycsb-demo-app.yaml
+kubectl apply -f https://nuodb.github.io/nuodb-cp-docs/static/samples/ycsb-demo-app.yaml
 ```
 
 Wait for the database to become ready.
@@ -115,9 +115,9 @@ This can be used in environments where custom annotations can't be specified.
 Delete all resources.
 
 ```sh
-kubectl delete -f https://raw.githubusercontent.com/nuodb/nuodb-cp-releases/main/docs/files/ycsb-demo-app.yaml
-kubectl delete -f https://raw.githubusercontent.com/nuodb/nuodb-cp-releases/main/docs/files/database.yaml
-kubectl delete -f https://raw.githubusercontent.com/nuodb/nuodb-cp-releases/main/docs/files/domain.yaml
+kubectl delete -f https://nuodb.github.io/nuodb-cp-docs/static/samples/ycsb-demo-app.yaml
+kubectl delete -f https://nuodb.github.io/nuodb-cp-docs/static/samples/database.yaml
+kubectl delete -f https://nuodb.github.io/nuodb-cp-docs/static/samples/domain.yaml
 ```
 
 [1]: https://kubernetes.io/docs/home/
