@@ -27,7 +27,7 @@ spec:
       containers:
       - name: ycsb-load
         image: docker.io/nuodb/ycsb:latest
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         env:
         - name: DB_NAME
           valueFrom:
@@ -59,17 +59,33 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: metadata.namespace
+        - name: CA_BUNDLE_FILE
+          value: /etc/nuodb/keys/ca.pem
+        - name: VERIFY_HOSTNAME
+          value: "false"
         - name: NO_OF_PROCESSES
           value: "2"
         - name: NO_OF_ITERATIONS
           value: "0"
-        resources:  
+        resources:
           limits:
-            cpu: "1"
+            cpu: 1
             memory: 1Gi
           requests:
             cpu: 500m
             memory: 500Mi
+        volumeMounts:
+        - name: tls
+          mountPath: /etc/nuodb/keys
+          readOnly: true
+      volumes:
+      - name: tls
+        configMap:
+          name: acme-messaging-demo-info
+          defaultMode: 0644
+          items:
+            - key: caPem
+              path: ca.pem
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       terminationGracePeriodSeconds: 10

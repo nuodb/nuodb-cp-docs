@@ -1,0 +1,89 @@
+# CircleCI 2.1 configuration file
+#
+version: 2.1
+
+orbs:
+  # Check https://circleci.com/developer/orbs/orb/circleci/node for more details
+  node: circleci/node@5.2.0
+
+  # Check https://circleci.com/developer/orbs/orb/circleci/hugo for more details
+  hugo: circleci/hugo@1.3.1
+
+executors:
+  base:
+    # Check https://circleci.com/developer/images/image/cimg/base for more details
+    docker:
+      - image: cimg/base:2023.05
+    resource_class: small
+
+jobs:
+  build:
+    executor: base
+    steps:
+      - checkout
+      - node/install:
+          node-version: '20'
+      - run:
+          name: "Install Dart Sass"
+          command: npm install -g sass
+      - restore_cache:
+          keys:
+            - v1-npm-deps-{{ checksum "package-lock.json" }}
+      - run:
+          name: Install dependencies
+          command: npm ci
+      - hugo/install:
+          version: 0.132.2
+      - run:
+          name: "Build website"
+          command: |
+            # Inject custom javascript
+            cat test/assets/js/proxy-links.js >> assets/js/custom.js
+            artifactsUrl="https://output.circle-artifacts.com/output/job/${CIRCLE_WORKFLOW_JOB_ID}/artifacts/0/site"
+            npm run build \
+              -- \
+              --baseURL "${artifactsUrl}/"
+          environment:
+            # For maximum backward compatibility with Hugo modules
+            HUGO_ENVIRONMENT: production
+            HUGO_ENV: production
+            TZ: America/New_York
+      - persist_to_workspace:
+            paths:
+              - public
+            root: .
+      - store_artifacts: # upload docs site in Artifacts
+          path: public
+          destination: site
+      - save_cache:
+          key: v1-npm-deps-{{ checksum "package-lock.json" }}
+          paths:
+            - "node_modules"
+
+  test:
+    executor: hugo/default
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: "Static analysis"
+          command: |
+            htmlproofer public \
+              --log-level info \
+              --checks-to-ignore '' \
+              --directory-index-file index.html \
+              --extension .html \
+              --timeframe '1h' \
+              --typhoeus-config '{}' \
+              --check-html true \
+              --disable-external true
+
+workflows:
+  continuous:
+    jobs:
+      - build:
+          name: "Build docs"
+      - test:
+          name: "Validate HTML"
+          requires:
+            - "Build docs"
