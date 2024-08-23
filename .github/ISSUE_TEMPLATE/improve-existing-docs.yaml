@@ -6,10 +6,9 @@ body:
   - type: markdown
     attributes:
       value: |
-        **HUBBERS!!** This is the github/docs open source repo. You may want to open an issue in the internal-only github/docs-content repo instead.
-
-        * Check to make sure someone hasn't already opened a similar [issue](https://github.com/nuodb/nuodb-cp-docs/issues).
-        * Before you file an issue read the [Contributing guide](https://github.com/nuodb/nuodb-cp-docs?tab=readme-ov-file#contribute).
+        Please check to make sure someone hasn't already opened a similar [issue](https://github.com/nuodb/nuodb-cp-docs/issues).
+        Any contributions to this repository are welcome.
+        Please read the [Contributing guide](https://github.com/nuodb/nuodb-cp-docs?tab=readme-ov-file#contribute) before opening a PR.
 
   - type: textarea
     attributes:
