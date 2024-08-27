@@ -1,0 +1,28 @@
+name: Improve existing content
+description: Make a suggestion to improve the documentation content.
+labels:
+  - content
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please check to make sure someone hasn't already opened a similar [issue](https://github.com/nuodb/nuodb-cp-docs/issues).
+        Any contributions to this repository are welcome.
+        Please read the [Contributing guide](https://github.com/nuodb/nuodb-cp-docs?tab=readme-ov-file#contribute) before opening a PR.
+
+  - type: textarea
+    attributes:
+      label: What page on https://nuodb.github.io/nuodb-cp-docs is affected?
+      description: Please link to the page you'd like to see updated.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: What part(s) of the article would you like to see updated?
+      description: |
+        - Give as much detail as you can to help us understand the change you want to see.
+        - Why should the docs be changed?
+        - What is the expected outcome or behavior?
+    validations:
+      required: true
