@@ -49,7 +49,7 @@ export NUODB_CP_PASSWORD="$(kubectl get secret dbaas-user-system-admin -n nuodb-
 {{< callout context="note" title="Note" icon="outline/info-circle" >}}
 The *system/admin* is the first cluster administrator user created during installation.
 It is recommended to create less privileged users after installation.
-For more information, see [User Management and Access Control]({{< ref "../administration/user-management.md" >}}).
+For more information, see [User Management and Access Control]({{< ref "../administration/authentication/user-management.md" >}}).
 {{< /callout >}}
 
 If the Nginx TLS certificate is not signed by a public CA, configure `nuodb-cp` to trust it.
