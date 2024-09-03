@@ -24,7 +24,11 @@
         {{- with .icon }}
           {{ partial "inline-svg" (dict "src" . "stroke" "#7758bc" "stroke-width" "0.8" "height" "4.5rem" "width" "4.5rem" "class" "svg-inline-custom mb-3 me-3" )}}
         {{- end }}
-        <h5 class="card-title my-0"><a href="{{ .href }}"{{ with .target}} target="{{ . }}"{{ end }} class="stretched-link text-reset text-decoration-none"{{ with .rel}} rel="{{ . }}"{{ end }}>{{ .title }}</a></h5>
+        {{- $link := .href -}}
+        {{ if not (strings.Contains .href "://") }}
+        {{- $link = ref .page .href -}}
+        {{- end }}
+        <h5 class="card-title my-0"><a href="{{ $link }}"{{ with .target }} target="{{ . }}"{{ end }} class="stretched-link text-reset text-decoration-none"{{ with .rel}} rel="{{ . }}"{{ end }}>{{ .title }}</a></h5>
         {{ with .description }}<p class="card-text mt-2">{{ . }}</p>{{ end }}
       </div>
       <div class="d-flex flex-column justify-content-center">

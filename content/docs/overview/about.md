@@ -21,9 +21,9 @@ NuoDB databases are created on-demand remotely using REST services by exposing v
 ## Run on the Cloud
 
 {{< card-grid >}}
-{{< link-card title="Install NuoDB Control Plane" href="/docs/getting-started/deploy-nuodb-control-plane/" icon="outline/stack-push" description="Start managing NuoDB databases deployed in Kubernetes" >}}
-{{< link-card title="Deploy NuoDB databases" href="/docs/getting-started/create-your-first-database/" icon="outline/rocket" description="Create NuoDB databases on-demand easily" >}}
-{{< link-card title="Start Developing" href="/docs/getting-started/connect-to-the-database/" icon="outline/code" description="Connect to your database and start developing with NuoDB" >}}
+{{< link-card title="Install NuoDB Control Plane" href="../getting-started/installation.md" icon="outline/stack-push" description="Start managing NuoDB databases deployed in Kubernetes" >}}
+{{< link-card title="Deploy NuoDB databases" href="../getting-started/create-database.md" icon="outline/rocket" description="Create NuoDB databases on-demand easily" >}}
+{{< link-card title="Start Developing" href="../getting-started/connect-database.md" icon="outline/code" description="Connect to your database and start developing with NuoDB" >}}
 {{< /card-grid >}}
 
 ## Architecture
