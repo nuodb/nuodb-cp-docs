@@ -16,7 +16,7 @@ seo:
 
 NuoDB Control Plane allows users to provision NuoDB databases on-demand remotely using REST services by exposing various predefined configuration options.
 
-This document describes how to provision NuoDB databases in a multi-tenant model by using the NuoDB Control Plane (CP).
+This page describes how to deploy the NuoDB Control Plane into your Kubernetes Cluster.
 The NuoDB Control Plane works with [Kubernetes][1] locally or in the cloud.
 Follow the steps in this guide regardless of the selected Kubernetes platform provider.
 

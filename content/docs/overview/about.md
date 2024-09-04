@@ -16,7 +16,7 @@ seo:
 
 NuoDB Control Plane (CP) enables customers to consume NuoDB in a Database as a Service (DBaaS) model.
 It runs inside a Kubernetes cluster and handles provisioning and management of multiple domains, and their databases, in the _same_ cluster.
-NuoDB databases are created on-demand remotely using REST services by exposing various predefined configuration options.
+NuoDB databases are created on-demand remotely using REST services using various predefined configuration options.
 
 ## Run on the Cloud
 
@@ -56,22 +56,22 @@ The NuoDB Control Plane can be broken down into several communicating layers.
 
 ### REST Service
 
-DBaaS REST Service allows multi-tenant access to external customers according to access control rules.
-It exposes a REST API to external customers that enables remote management of NuoDB domains and databases using coarse-grained CRUD operations (Create, Read, Update, and Delete).
-The data model used by the DBaaS REST Service to define user access control and pricing is summarized below:
+DBaaS REST Service allows multi-tenant access for external customers according to access control rules.
+It exposes a REST API that enables remote management of NuoDB domains and databases using coarse-grained CRUD operations (Create, Read, Update, and Delete).
+The data model used by the DBaaS REST Service to define user access control is summarized below:
 
-- _Organizations_ have several users and payment information associated with them.
+- _Organizations_ have several users and policies associated with them.
 - _Projects_ are logical groupings of databases and have a service tier associated with them.
 - _Users_ have roles that control access to projects and databases.
 
-Projects abstract the aspects of domains that are relevant for DBaaS users, specifically, pricing of databases and isolation between databases. Databases within the same project will inherit the service tier from the project in which they belong, and databases in different projects will be part of different domains.
+Projects abstract the aspects of domains that are relevant for DBaaS users and provide isolation between databases.
+Databases within the same project will inherit the service tier from the project to which they belong, and databases in different projects will be part of different domains.
 
 The REST APIs for projects and databases internally manipulate Domain and Database custom resources (CRs), respectively.
-More information about the CRs is available in [Custom Resources](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/#custom-resources).
 
 ### DBaaS Operator
 
-A [Kubernetes Operator](https://coreos.com/operators/) which deploys NuoDB into Kubernetes cluster.
+The DBaaS Operator is a [Kubernetes Operator](https://coreos.com/operators/) which deploys NuoDB into the Kubernetes cluster.
 The Go Operator enables easy deployment of the NuoDB domain and database into the local Kubernetes cluster by using [NuoDB Helm Charts](https://github.com/nuodb/nuodb-helm-charts) and exposing high-level configuration to the user.
 
 ### NuoDB Helm charts
