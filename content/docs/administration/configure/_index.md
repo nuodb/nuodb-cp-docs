@@ -1,11 +1,11 @@
 ---
-title: "Troubleshooting"
+title: "Manage Configurations"
 description: ""
 summary: ""
 date: 2024-08-14T13:50:47+03:00
 lastmod: 2024-08-14T13:50:47+03:00
 draft: false
-weight: 900
+weight: 300
 toc: true
 sidebar:
   collapsed: true

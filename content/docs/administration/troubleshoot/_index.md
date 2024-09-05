@@ -1,11 +1,11 @@
 ---
-title: "Offerings"
+title: "Troubleshoot"
 description: ""
 summary: ""
 date: 2024-08-14T13:50:47+03:00
 lastmod: 2024-08-14T13:50:47+03:00
 draft: false
-weight: 300
+weight: 900
 toc: true
 sidebar:
   collapsed: true
