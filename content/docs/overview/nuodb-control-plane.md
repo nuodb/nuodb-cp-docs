@@ -86,7 +86,7 @@ Configuration information is stored in _ConfigMap_ and _Secret_ resources.
 ### DBaaS Configuration and Offerings
 
 Internally, the NuoDB Control Plane leverages _Service Tiers_ and _Helm Features_ to streamline database deployment and provide DBaaS end users with a variety of predefined configuration options.
-For more information on creating reusable configuration options, refer to the documentation on [Service Tiers]({{< ref "../administration/offerings/service-tiers.md" >}}).
+For more information on creating reusable configuration options, refer to the documentation on [Service Tiers]({{< ref "../administration/configure/service-tiers.md" >}}).
 
 ### NuoDB
 
