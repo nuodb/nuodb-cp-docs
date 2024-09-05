@@ -1,5 +1,5 @@
 ---
-title: "Manage Offerings"
+title: "Manage Configurations"
 description: ""
 summary: ""
 date: 2024-08-14T13:50:47+03:00
