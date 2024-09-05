@@ -14,7 +14,6 @@ seo:
   noindex: false # false (default) or true
 ---
 
-
 The NuoDB Control Plane (CP) empowers customers to leverage NuoDB in a Database as a Service (DBaaS) model.
 Operating within a Kubernetes cluster, it manages the provisioning and administration of multiple administrative domains and their databases, all within the same cluster.
 NuoDB databases are dynamically created remotely with a variety of predefined configuration options available.
