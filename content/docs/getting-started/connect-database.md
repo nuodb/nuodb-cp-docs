@@ -44,6 +44,20 @@ nuosql "demo@${DB_URL}:8443" --user dba --password changeIt --connection-propert
 [NuoDB client](https://github.com/nuodb/nuodb-client/releases) package v20230228 or later is required to connect to DBaaS database.
 
 {{< /tab >}}
+
+{{< tab "terraform" >}}
+
+```terraform
+output "ca_cert" {
+  value = nuodbaas_database.db.status.ca_pem
+}
+
+output "db_url" {
+  value = nuodbaas_database.db.status.sql_endpoint
+}
+```
+
+{{< /tab >}}
 {{< /tabs >}}
 
 ### Quick links

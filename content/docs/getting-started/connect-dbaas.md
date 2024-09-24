@@ -20,6 +20,7 @@ This section describes how to connect to the NuoDB Control Plane REST service vi
 
 - [nuodb-cp](https://github.com/nuodb/nuodb-cp-releases/releases/latest/download/nuodb-cp) or [cURL](https://curl.se/download.html)
 - [jq](https://jqlang.github.io/jq/download/)
+- (Optional) [terraform](https://developer.hashicorp.com/terraform/downloads)
 
 ## Access and Authentication
 
@@ -63,4 +64,24 @@ Configure `cURL` with DBaaS credentials.
 
 ```sh
 alias curl="curl -s -k -u \"${NUODB_CP_USER}:${NUODB_CP_PASSWORD}\""
+```
+
+### Setting up the Terraform Provider
+
+To use terraform to manage your databases, you will want to use the `nuodbaas` provider.
+In production, you will want to specify connection parameters explicitly, but, for prototyping, the provider can find its configuration in the environment varaibles set above.
+
+```terraform
+terraform {
+  required_providers {
+    nuodbaas = {
+      source  = "registry.terraform.io/nuodb/nuodbaas"
+      version = "1.1.0"
+    }
+  }
+}
+
+provider "nuodbaas" {
+    skip_verify = true
+}
 ```
