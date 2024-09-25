@@ -68,20 +68,22 @@ alias curl="curl -s -k -u \"${NUODB_CP_USER}:${NUODB_CP_PASSWORD}\""
 
 ### Setting up the Terraform Provider
 
-To use terraform to manage your databases, you will want to use the `nuodbaas` provider.
-In production, you will want to specify connection parameters explicitly, but, for prototyping, the provider can find its configuration in the environment varaibles set above.
+To use terraform to manage your databases, you will want to use the [`nuodbaas` provider](https://registry.terraform.io/providers/nuodb/nuodbaas).
+The [provider documentation](https://registry.terraform.io/providers/nuodb/nuodbaas/latest/docs#schema) covers all of the attributes you can define but, if they are not set, the provider can infer a configuration using the environment variables set above.
 
 ```terraform
 terraform {
   required_providers {
     nuodbaas = {
       source  = "registry.terraform.io/nuodb/nuodbaas"
-      version = "1.1.0"
+      version = "1.2.0"
     }
   }
 }
 
 provider "nuodbaas" {
+    # The provider does not support self signed certificates.
+    # Disable certificate validation if your Control Plane certificate is not signed by a trusted CA.
     skip_verify = true
 }
 ```
