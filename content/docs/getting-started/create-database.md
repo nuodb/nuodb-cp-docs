@@ -125,7 +125,7 @@ echo "Database is available"
 {{< /tab >}}
 {{< tab "terraform" >}}
 
-Terraform waits until all resources are available before available before reporting a success.
+Terraform waits until all resources are available before reporting a success.
 
 {{< /tab >}}
 {{< /tabs >}}

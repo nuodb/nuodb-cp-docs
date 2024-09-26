@@ -71,7 +71,7 @@ alias curl="curl -s -k -u \"${NUODB_CP_USER}:${NUODB_CP_PASSWORD}\""
 To use terraform to manage your databases, you will want to use the [`nuodbaas` provider](https://registry.terraform.io/providers/nuodb/nuodbaas).
 The [provider documentation](https://registry.terraform.io/providers/nuodb/nuodbaas/latest/docs#schema) covers all of the available attributes.
 All of the them are optional.
-For any that you do not specify, the provider will check the environment variables set above.
+For any that you do not specify, the provider will try to infer a value from the environment variables set above before exiting with an error.
 
 ```terraform
 terraform {
