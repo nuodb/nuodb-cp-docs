@@ -43,6 +43,18 @@ curl -X PUT -H 'Content-Type: application/json' \
 ```
 
 {{< /tab >}}
+{{< tab "terraform" >}}
+
+```terraform
+resource "nuodbaas_project" "proj" {
+  organization = "acme"
+  name         = "messaging"
+  sla          = "dev"
+  tier         = "n0.small"
+}
+```
+
+{{< /tab >}}
 {{< /tabs >}}
 
 {{< callout context="note" title="Note" icon="outline/info-circle" >}}
@@ -72,6 +84,18 @@ curl -X PUT -H 'Content-Type: application/json' \
 ```
 
 {{< /tab >}}
+{{< tab "terraform" >}}
+
+```terraform
+resource "nuodbaas_database" "db" {
+  organization = nuodbaas_project.proj.organization
+  project      = nuodbaas_project.proj.name
+  name         = "demo"
+  dba_password = "changeIt"
+}
+```
+
+{{< /tab >}}
 {{< /tabs >}}
 
 Wait for the database to become available.
@@ -97,6 +121,11 @@ while [ "$(curl $NUODB_CP_URL_BASE/databases/acme/messaging/demo | jq '.status.r
 done
 echo "Database is available"
 ```
+
+{{< /tab >}}
+{{< tab "terraform" >}}
+
+Terraform waits until all resources are available before reporting a success.
 
 {{< /tab >}}
 {{< /tabs >}}

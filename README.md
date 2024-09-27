@@ -61,6 +61,7 @@ Please read the [Doks theme](https://getdoks.org/docs/basics/authoring-content/)
 To serve a local version of the docs site with your changes, run:
 
 ```sh
+npm install # Download dependencies
 npm run dev
 ```
 
