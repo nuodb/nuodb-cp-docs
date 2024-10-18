@@ -13,35 +13,35 @@ seo:
   canonical: "" # custom canonical URL (optional)
   noindex: false # false (default) or true
 ---
-
-NuoDB DBaaS provides built-in mechanisms for database backup and clone operations leveraging volume snapshotting facilities available in the Kubernetes cluster and the corresponding storage provider.
-The user configures policies for taking regular backups for databases or create on-demand backups.
-Such backups are used to create a clone of the protected database in scenarios such as unexpected data corruption, data loss during a disaster, or database migrations.
+NuoDB DBaaS (NuoDBaaS) provides built-in mechanisms for database backup and clone operations leveraging volume snapshotting facilities available in the Kubernetes cluster and the corresponding storage provider.
+The user can either create database on-demand backups or configure backup policies to schedule backups and manage backup retention.
+These backups are used to clone the protected database in the case of unexpected data loss, such as during a physical disaster or operational outage.
 
 ## Backup contents
 
-NuoDB database consists of one or more Storage Managers (SMs) which save the current state of the database in archive and journal volumes.
+A NuoDB database consists of one or more Storage Managers (SMs) that record the current database state in archive and journal volumes on disk.
 Kubernetes persistent volume claims (PVC) and persistent volumes (PV) resources are used to request and provision block storage from the underlying cloud provider.
 
-NuoDB DBaaS database backup captures the current state of the NuoDB database including its data and configuration.
-Volume snapshots are created for archive and journal volumes where the cloud provider's storage system executes, stores, and secures the snapshots.
-DBaaS controls the main lifecycle of the volume snapshots (i.e. request creation and deletion) but any other lifecycle operations on snapshots must be performed using the cloud provider tools.
-If multiple SMs are configured to run for redundancy in a database, there are already multiple copies of your database.
-DBaaS backup facilities will choose a running SM with the lowest ordinal as a backup target.
+NuoDBaaS database backup captures the current state of the NuoDB database including its data and configuration.
+During a backup, volume snapshots are created for the database archive and journal volumes.
+The cloud provider's storage system executes, stores, and secures the underlying snapshots.
+NuoDBaaS controls the lifecycle of the volume snapshots (i.e. requests creation and deletion) but any other operations on snapshots must be performed using the cloud provider tools.
+If multiple SMs are configured to establish storage redundancy in a database, there are already multiple copies of your database.
+In this case, NuoDBaaS backup facilities will choose a running SM with the lowest ordinal as a backup target.
 
-{{< callout context="note" title="Note" icon="outline/info-circle" >}}
+{{< callout context="note" title="Table partitioning and Storage groups" icon="outline/info-circle" >}}
 Table partitioning and Storage groups (TPSG) allow different SMs to serve a disjoint set of storage groups.
 A complete set of database archives serving all storage groups (SGs) ensures that backup coverage is complete.
-Therefore multiple SMs must be selected as backup targets when TPSG is configured.
-TPSG support is not available with DBaaS yet.
+Therefore, multiple SMs must be selected as backup targets when TPSG is configured.
+TPSG support is not available in NuoDBaaS yet.
 {{< /callout >}}
 
-Database configuration such as `Database` custom resource (CR) and current DBA password are stored in a backup registry.
-The database configuration is used during the restore operation to validate and set default values for database volumes, and to change the DBA password.
-The backup registry also containes metadata about the backup such as volume snapshot information, `PVC` resources, and backup status.
+Database configurations such as the `Database` custom resource (CR) and current DBA password are stored in the database backup catalog.
+The database configuration is used during the restore operation to validate and set default values for database volumes, as well as change the DBA password.
+The backup catalog also contains metadata about the backup such as volume snapshot information, `PVC` resources, and backup status.
 
 {{< callout context="note" title="Note" icon="outline/info-circle" >}}
-DBaaS uses `Secret` resources as a backup registry created in the Kubernetes cluster where the backup is taken.
+NuoDBaaS uses `Secret` resources as a backup catalog created in the Kubernetes cluster where the backup is taken.
 {{< /callout >}}
 
 ## Using on-demand backup
@@ -52,7 +52,7 @@ After being requested, the backup is executed by the system asynchronously.
 
 ### Request backup
 
-Connect to DBaaS as described in [Connect to NuoDB Control Plane]({{< ref "../../getting-started/connect-dbaas.md" >}}).
+Connect to NuoDBaaS as described in [Connect to NuoDB Control Plane]({{< ref "../../getting-started/connect-dbaas.md" >}}).
 Request on-demand backup of an existing database.
 
 {{< tabs "create-new-backup" >}}
@@ -74,7 +74,7 @@ curl -X POST -H 'Content-Type: application/json' \
 {{< /tab >}}
 {{< /tabs >}}
 
-The system generates a backup name with the format `yyyyMMddHHmmss` using the current time in the UTC time zone (e.g. `20241004095616`) and outputs the backup fully-qualified name.
+The system generates a backup name with the format `yyyyMMddHHmmss` using the current time in the UTC zone (e.g. `20241004095616`) and outputs the backup fully-qualified name.
 
 Example output:
 
@@ -142,15 +142,15 @@ echo "Backup completed"
 {{< /tab >}}
 {{< /tabs >}}
 
-### Import a backup
+### Import backup
 
-DBaaS uses an embedded backup manager to execute and monitor backups.
-A backup registry holds a calatog about existing database backups.
-By default `Secret` resources are used as a backup registry that are bound to a single Kubernetes cluster.
-A DBaaS administrator can transfer a backup registry `Secret` resource from another cluster running in the same region.
+NuoDBaaS uses an embedded backup manager to execute and monitor backups.
+A backup catalog holds information about existing database backups.
+By default `Secret` resources are used as a backup catalog bound to a single Kubernetes cluster.
+A NuoDBaaS administrator can transfer a backup catalog `Secret` resource from another cluster running in the same region.
 For more information on backup execution and management, see [Backup Plugin]({{< ref "../../administration/backup/data-protection-overview.md#backup-plugin" >}})
 
-Before such backup is usable in DBaaS, it must be imported by supplying its `backupHandle` and `pluginName` which manages the backup.
+Before a backup can be used in NuoDBaaS, it must be imported by supplying its `backupHandle` and the `pluginName` that manages the backup.
 
 {{< tabs "import-backup" >}}
 {{< tab "nuodb-cp" >}}
@@ -189,3 +189,8 @@ resource "nuodbaas_backup" "backup" {
 
 {{< /tab >}}
 {{< /tabs >}}
+
+{{< callout context="note" title="PUT vs POST method" icon="outline/info-circle" >}}
+Notice that the above call uses the _PUT_ method which creates or updates a backup and allows specifying an explicit backup name and import source as opposed to the _POST_ method used when creating an on-demand backup.
+{{< /callout >}}
+

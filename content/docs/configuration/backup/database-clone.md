@@ -14,20 +14,20 @@ seo:
   noindex: false # false (default) or true
 ---
 
-The section describes how to restore a database from a backup by creating a new database.
+This section describes how to restore a database from a backup by creating a new database.
 This approach has an advantage over in-place restore where an existing database state is reverted back in time because the original database is not modified or deleted during the restore operation.
-To restore a database, a new database (referred to as _clone_) is created from a successful backup (referred to as restore source).
+To restore a database, a new database (referred to as _clone_) is created from a successful backup (referred to as the restore source).
 
 ## Restore database from backup
 
-The cloned database state is restored from the data in the backup and its configuration is merged with the one stored in the backup.
-DBaaS automatically infers database volume sizes from the backup or validates that the supplied values satisfy the restore.
+The cloned database state is restored from the data in the backup and the supplied configuration is merged with the one stored in the backup.
+NuoDBaaS automatically infers database volume sizes from the backup or validates that the supplied values satisfy the restore.
 The DBA password in the database archive is changed to match the desired value of the new database by using the previous password stored in the backup.
 Database restore operation fails if the supplied backup can not be restored or if the original database configuration is incompatible with the clone.
 
-{{< callout context="tip" title="Did you know?" icon="outline/info-circle" >}}
-A cloned database lifecycle is decoupled from the original one or the backup used to create it.
-DBaaS does not support restore-in-place, however, the same can be achieved by deleting the existing database and creating a new one with the same name from the decired backup.
+{{< callout context="tip" title="Clone vs in-place restore" icon="outline/info-circle" >}}
+A cloned database lifecycle is decoupled from the original database or the backup used to create it.
+NuoDBaaS does not support restore-in-place, however, the same result can be achieved by deleting the existing database and creating a new one with the same name from the desired backup.
 This operation requires downtime, so make sure that it is planned.
 {{< /callout >}}
 
@@ -35,13 +35,13 @@ This operation requires downtime, so make sure that it is planned.
 
 Set the `restoreFrom.backup` field of the clone to the restore source.
 The backup's fully-qualified name is used in the form of `<org>/<proj>/<db>/<backup>` as a restore source.
-If some of the elements in the name prefix are omitted, they are assumed depending on the context.
+If some prefix is omitted, it is taken from the clone database.
 For example, when creating a cloned database `acme/messaging/clone` with backup source `demo/20241004095616`, the system will assume that the backup exists in organization `acme` and project `messaging`.
-The cloned database can be created in any organization or project to which the user has access.
+The cloned database can be created in any organization or project that the user has access.
 The user creating the clone must have read permission to the backup used as a restore source.
 
 {{< callout context="caution" title="Caution" icon="outline/alert-triangle" >}}
-Using backup to restore a database in a different cloud region is not supported.
+Using a backup to restore a database in a different cloud region is not supported.
 {{< /callout >}}
 
 Create a new database clone and supply the backup to restore it from.
@@ -72,10 +72,10 @@ curl -X PUT -H 'Content-Type: application/json' \
 resource "nuodbaas_database" "db" {
  organization = nuodbaas_project.proj.organization
  project      = nuodbaas_project.proj.name
- name         = "demo"
+ name         = "clone"
  dba_password = "changeIt"
  restore_from = {
- backup = "demo/20241004095616"
+   backup = "acme/messaging/demo/20241004095616"
  }
 }
 ```
@@ -85,23 +85,23 @@ resource "nuodbaas_database" "db" {
 
 ### Restore operation
 
-Database restore operation is performed asynchronously.
+A database restore operation is performed asynchronously.
 The following prerequisites are enforced by the system:
 
 - The backup used as a restore source must exist in the Kubernetes cluster along with the corresponding snapshots on the cloud provider's storage system
-- The snapshots must be in a state that allows new volumes to be created out of them.
-Most storage providers allow changing the snapshot storage tier to achive lower costs but with minimum archival and longer data retrieval times.
+- The snapshots must be in a state that allows new volumes to be created.
+Most storage providers allow changing the snapshot storage tier to achieve lower costs but with minimum archival and longer data retrieval times.
 - The backup must be in `Succeeded` state
-- Archive and journal volume sizes of the clone must be greater or equal to the values of the original one
-- If the original database was configured with an external journal enabled, the clone must also has external journal enabled
-- The NuoDB product version of the clone must be equal to or greater than the one used on the original database
+- Archive and journal volume sizes of the clone must be greater than or equal to the values of the original one
+- If the original database was configured with an external journal, the clone must also have an external journal
+- The NuoDB product version of the database clone must be greater than or equal to the product version of the original database
 
 {{< callout context="note" title="Note" icon="outline/info-circle" >}}
 A new database that is being restored from a backup has `Restoring` state.
 {{< /callout >}}
 
-After the database is `Available`, the DBA password stored in the restored archive is rotated with the newly supplied password.
-This happens instantly after the database is ready to accept SQL connections, however, it may take several seconds before you can connect to the database.
+After the database is `Available`, the DBA password stored in the restored archive is replaced with the newly supplied password.
+This happens immediately after the database is ready to accept SQL connections, however, it may take several seconds before you can connect to the database.
 
 ### Troubleshooting restore failures
 
@@ -149,7 +149,7 @@ failed to restore database data: no snapshot for the journal volume found in bac
 
 {{< details "Action" >}}
 Disable external journal on the new database.
-If you want to change this setting, an SQL dump must be used to restore the data into a new database with an external journal enabled.
+If you want to change this setting, SQL dump must be used to restore the data into a new database with an external journal enabled.
 {{< /details >}}
 
 {{< callout context="caution" title="Caution" icon="outline/alert-triangle" >}}
@@ -167,5 +167,5 @@ unhealthy components: [storageManagers transactionEngines];
 ```
 
 {{< details "Action" >}}
-Ensure that the recent NuoDB version is configured on the clone and contact NuoDB support.
+Ensure that a recent NuoDB version is configured on the clone and contact NuoDB support.
 {{< /details >}}

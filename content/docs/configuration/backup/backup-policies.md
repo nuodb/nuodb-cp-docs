@@ -14,8 +14,8 @@ seo:
   noindex: false # false (default) or true
 ---
 
-Database backup policies automate regular backups and backup retention to support the enterprise's data protection strategy.
-Policies define rules, which gives you granular control over backing up DBaaS database resources so that you achieve the desired recovery point object (RPO).
+Database backup policies automate backup creation and backup retention as part of an enterprise's data protection strategy.
+Policies define rules that give users granular control over database backups, enabling them to achieve the desired recovery point objective (RPO).
 
 ## Frequency
 
@@ -30,17 +30,17 @@ For more information on missed backups, see [List missed backups by policy]({{< 
 ## Targets selection
 
 A single backup policy matches one or multiple target databases.
-Matching target databases is performed by defining _scope_, SLA, service tier, and user labels.
+Target databases are matched by defining _scope_, SLA, service tier, and user labels.
 The target selection is an intersection among all filters.
 
-The scope has the format `<organization>/<project>/<database>` which binds to a specific object in the hierarchy of DBaaS objects (_organizations_, _projects_, _databases_) and expands to the set of databases to backup.
+The scope has the format `<organization>/<project>/<database>` which binds to a specific object in the hierarchy of NuoDBaaS objects (_organizations_, _projects_, _databases_) and expands to the set of databases to backup.
 For example, the scope `acme/messaging` selects all databases within _acme_ organization and _messaging_ project.
-Policies created in one organization may select databases in different organizations as long as the user creating the policy has that level of access.
+Policies created in one organization may select databases in different organizations as long as the user has sufficient access privileges to define a policy with a scope wider than a single organization.
 
 ## Backup retention
 
-DBaaS enforces the configured retention for regular backups so that they meet the RPO objectives.
-By default, all backups are retained indefinitely, however, you can define high-level rules for keeping only certain backups corresponding to multiple backup cycles.
+NuoDBaaS enforces the configured retention for regular backups to meet the RPO.
+By default, all backups are retained indefinitely, however, you can define high-level rules for keeping only certain backups.
 
 ### Backup rotation scheme
 
@@ -48,10 +48,10 @@ The Grandfather-father-son (GFS) backup scheme is a data retention strategy desi
 GFS backup rotation happens cyclically, with each backup occurring at the scheduled time repeatedly.
 Users configure the number of backups to retain from each cycle.
 
-The available cycles are `hourly`, `daily`, `weekly`, `monthly` and `yearly`.
-For example, `7 daily` means that up to 7 daily backups with the last 7 days will be retained.
+The available cycles are `hourly`, `daily`, `weekly`, `monthly`, and `yearly`.
+For example, `7 daily` means that up to seven daily backups with the last seven days will be retained.
 A _daily_ backup is any completed backup requested during the same day.
-The time span for different cycles can overlap to increase the backup coverage.
+The period for different cycles can overlap to increase the backup coverage.
 
 #### Example
 
@@ -66,22 +66,20 @@ Assuming that today is July 18th, 2024, the retained backups from the last year 
 
 {{< picture src="retention-example.png" alt="Backup retention example" >}}
 
-{{< callout context="note" title="Note" icon="outline/info-circle" >}}
-By default, weeklies are taken on Sunday, monthlies on the first day of the month and yearlies on the first day of the year.
-The backup rotation scheme is fine-tuned based on the user's preferences using the retention `settings` backup policy field.
-{{< /callout >}}
+By default, weekly backups are chosen on Sunday, monthly on the first day of the month, and yearly on the first day of the year.
+The backup rotation scheme is fine-tuned based on the user's preferences using the `retention.settings` backup policy field.
 
 As time passes, new backups for each cycle are retained and those outside of the time range are deleted.
 For example, once a daily backup is taken on July 19th, the one from July 16th will be automatically deleted.
-By default, the rotation scheme is applied relative to the last successful backup if any.
+By default, the rotation scheme is applied relative to the last successful backup, if any.
 
-{{< callout context="tip" title="Did you know?" icon="outline/info-circle" >}}
-To prevent a specific backup from being deleted by backup rotation scheme and keep it forever, add a special label to the backup object with key `keep-forever` and value `true`.
+{{< callout context="tip" title="Retain a backup" icon="outline/info-circle" >}}
+To prevent a specific backup from being deleted by the backup rotation scheme and keep it forever, add a special label to the backup object with the key `keep-forever` and value `true`.
 {{< /callout >}}
 
 ### Create a backup policy
 
-Create a backup policy that schedules backups every day for all databases in organization `acme`, project `messaging`.
+Create a backup policy that schedules backups every day for all databases in organization `acme`, and project `messaging`.
 
 {{< tabs "create-policy" >}}
 {{< tab "nuodb-cp" >}}
@@ -128,7 +126,7 @@ resource "nuodbaas_backuppolicy" "pol" {
 {{< /tab >}}
 {{< /tabs >}}
 
-### List databases for policy
+### List databases for a policy
 
 List all the databases that a policy matches.
 
@@ -150,7 +148,7 @@ curl -X GET -H 'Content-Type: application/json' \
 {{< /tab >}}
 {{< /tabs >}}
 
-### List backups for policy
+### List backups for a policy
 
 List all the backups scheduled by a backup policy.
 
@@ -174,11 +172,13 @@ curl -X GET -H 'Content-Type: application/json' \
 
 ### List missed backups by policy
 
-In certain cases, it might not be possible for a policy to schedule backup on time
+In certain cases, it might not be possible for a policy to schedule a backup on time
 For example:
-- The DBaaS operator is not running
+- The NuoDBaaS operator is not running
 - The target database is disabled
-- A backup for this database already exists taken at the same time
+- A backup for this database was taken at the same time
+
+List all missed backups for the policy from the last schedule that had missed backups.
 
 {{< tabs "policy-list-missed" >}}
 {{< tab "nuodb-cp" >}}
@@ -213,9 +213,9 @@ Example output:
 
 ### Suspend and resume a policy
 
-You can temporarly suspend a backup policy so that no new backups are scheduled by it.
+A backup policy can be temporarily suspended, ensuring no new backups are scheduled.
 Edit the `suspended` field to suspend or resume a backup policy.
 
 {{< callout context="note" title="Note" icon="outline/info-circle" >}}
-Backups from suspended policy are not recorded as missed backups.
+Backups from a suspended policy are not recorded as missed backups.
 {{< /callout >}}
