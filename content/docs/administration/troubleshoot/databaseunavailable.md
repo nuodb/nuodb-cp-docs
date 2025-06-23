@@ -9,7 +9,7 @@ weight: 103
 toc: true
 seo:
   title: "" # custom title (optional)
-  description: "" # custom description (recommended)
+  description: "Database is not available to SQL applications" # custom description (recommended)
   canonical: "" # custom canonical URL (optional)
   noindex: false # false (default) or true
 ---
@@ -22,6 +22,10 @@ Database is not available.
 Database is not available to SQL applications.
 There are no Transaction Engines (TEs) ready to service clients.
 {{< /details >}}
+
+### Symptom
+
+To manually evaluate the conditions for this alert, see [Unready database component symptom]({{< ref "databasecomponentunreadyreplicas#symptom" >}}).
 
 ## Impact
 

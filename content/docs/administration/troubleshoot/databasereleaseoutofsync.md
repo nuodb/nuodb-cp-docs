@@ -9,7 +9,7 @@ weight: 110
 toc: true
 seo:
   title: "" # custom title (optional)
-  description: "" # custom description (recommended)
+  description: "Database resource desired state is out of sync" # custom description (recommended)
   canonical: "" # custom canonical URL (optional)
   noindex: false # false (default) or true
 ---
@@ -22,6 +22,24 @@ Database release is out of sync.
 Database resource desired state is out of sync.
 The corresponding database Helm release install/upgrade operation failed to apply the latest Helm values.
 {{< /details >}}
+
+### Symptom
+
+To manually evaluate the conditions for this alert follow the steps below.
+
+Database which desired state is out of sync will have the `Released` status condition set to `False`.
+List all out of sync databases.
+
+```sh
+JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[?(@.type=="Released")]}{@.type}={@.status}{"\n"}{end}{end}'
+kubectl get database -o jsonpath="$JSONPATH" | grep "Released=False"
+```
+
+Inspect the database `Released` condition message for more details.
+
+```sh
+kubectl get database <name> -o jsonpath='{.status.conditions[?(@.type=="Released")]}' | jq
+```
 
 ## Impact
 
@@ -42,7 +60,7 @@ By default, the public NuoDB Helm charts [repository](https://nuodb.github.io/nu
 
 ### Scenarios
 
-{{< details "Symptom 1: Helm charts repository not available" >}}
+{{< details "Scenario 1: Helm charts repository not available" >}}
 
 The NuoDB operator fails to reach the Helm chart repository and reports the following error:
 
@@ -61,7 +79,7 @@ Possible causes for Helm repository unreachable:
 
 {{< /details >}}
 
-{{< details "Symptom 2: Helm chart name or version are not found" >}}
+{{< details "Scenario 2: Helm chart name or version are not found" >}}
 
 The NuoDB operator fails to download the Helm chart and reports the following error:
 
@@ -78,7 +96,7 @@ Possible causes for Helm chart not found:
 
 {{< /details >}}
 
-{{< details "Symptom 3: Helm chart resource create/update failure" >}}
+{{< details "Scenario 3: Helm chart resource create/update failure" >}}
 
 Helm operations are targeting the Kubernetes API server directly.
 Kubernetes API server and admission controllers are validating incoming resources and any errors will result in failure of the entire Helm operation.

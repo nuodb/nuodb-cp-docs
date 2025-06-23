@@ -9,7 +9,7 @@ weight: 105
 toc: true
 seo:
   title: "" # custom title (optional)
-  description: "" # custom description (recommended)
+  description: "Domain resource has replicas which were declared to be unready" # custom description (recommended)
   canonical: "" # custom canonical URL (optional)
   noindex: false # false (default) or true
 ---
@@ -23,6 +23,24 @@ Domain resource has replicas which were declared to be unready.
 Domain component impacted by this alert is NuoDB Admin Process (AP).
 For example, it is expected for a domain to have 3 AP replicas, but it has less than that for a noticeable period of time.
 {{< /details >}}
+
+### Symptom
+
+To manually evaluate the conditions for this alert follow the steps below.
+
+Domain which has a component with unready replicas will have the `Ready` status condition set to `False`.
+List all unready domains.
+
+```sh
+JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[?(@.type=="Ready")]}{@.type}={@.status}{"\n"}{end}{end}'
+kubectl get domain -o jsonpath="$JSONPATH" | grep "Ready=False"
+```
+
+Inspect the domain component status and compare the `replicas` and `readyReplicas` fields.
+
+```sh
+kubectl get domain <name> -o jsonpath='{.status.components.admins}' | jq
+```
 
 ## Impact
 
@@ -51,7 +69,7 @@ Kubernetes readiness probes require that the APs are in `Connected` state and ca
 
 ### Scenarios
 
-{{< details "Symptom 1: Pod in `Pending` status for a long time" >}}
+{{< details "Scenario 1: Pod in `Pending` status for a long time" >}}
 
 Possible causes for a Pod not being scheduled:
 
@@ -61,7 +79,7 @@ Possible causes for a Pod not being scheduled:
 
 {{< /details >}}
 
-{{< details "Symptom 2: AP fails to join the domain" >}}
+{{< details "Scenario 2: AP fails to join the domain" >}}
 
 Upon startup, the AP communicates with its peers to join the domain and receives the domain state from the Raft leader.
 For more information, check [Admin Process Peering](https://doc.nuodb.com/nuodb/latest/domain-admin/admin-process/#_admin_process_ap_peering).

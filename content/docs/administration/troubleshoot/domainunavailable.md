@@ -9,7 +9,7 @@ weight: 107
 toc: true
 seo:
   title: "" # custom title (optional)
-  description: "" # custom description (recommended)
+  description: "Domain is not available to load-balance SQL clients or accept database configuration changes" # custom description (recommended)
   canonical: "" # custom canonical URL (optional)
   noindex: false # false (default) or true
 ---
@@ -22,6 +22,10 @@ Domain is not available.
 Domain is not available to load-balance SQL clients or accept database configuration changes.
 There are no NuoDB Admin processes (APs) ready in the NuoDB domain.
 {{< /details >}}
+
+### Symptom
+
+To manually evaluate the conditions for this alert, see [Unready domain component symptom]({{< ref "domaincomponentunreadyreplicas#symptom" >}}).
 
 ## Impact
 

@@ -1,6 +1,6 @@
 ---
 title: "DatabaseComponentUnreadyReplicas"
-description: ""
+description: "Database resource has a component with replicas which were declared to be unready"
 summary: ""
 date: 2025-06-05T13:52:09+03:00
 lastmod: 2025-06-05T13:52:09+03:00
@@ -9,7 +9,7 @@ weight: 100
 toc: true
 seo:
   title: "" # custom title (optional)
-  description: "" # custom description (recommended)
+  description: "Database resource has a component with replicas which were declared to be unready" # custom description (recommended)
   canonical: "" # custom canonical URL (optional)
   noindex: false # false (default) or true
 ---
@@ -20,11 +20,29 @@ Database component has unready replicas.
 
 {{< details "Full context" open >}}
 Database resource has a component with replicas which were declared to be unready.
-Database components impacted by this alert are Transaction Engines (TEs) and Storage Managers (SMs)
+Database components impacted by this alert are Transaction Engines (TEs) and Storage Managers (SMs).
 For example, it is expected for a database to have 2 TE replicas, but it has less than that for a noticeable period of time.
 
-On rare occasions, there may be more replicas than it should and system did not clean it up.
+On rare occasions, there may be more replicas than request and the system did not clean them up.
 {{< /details >}}
+
+### Symptom
+
+To manually evaluate the conditions for this alert follow the steps below.
+
+Database which has a component with unready replicas will have the `Ready` status condition set to `False`.
+List all unready databases.
+
+```sh
+JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[?(@.type=="Ready")]}{@.type}={@.status}{"\n"}{end}{end}'
+kubectl get database -o jsonpath="$JSONPATH" | grep "Ready=False"
+```
+
+Inspect the database component status and compare the `replicas` and `readyReplicas` fields.
+
+```sh
+kubectl get database <name> -o jsonpath='{.status.components}' | jq
+```
 
 ## Impact
 
@@ -47,17 +65,17 @@ Kubernetes readiness probes require that the database processes are in `MONITORE
 
 ### Scenarios
 
-{{< details "Symptom 1: Pod in `Pending` status for a long time" >}}
+{{< details "Scenario 1: Pod in `Pending` status for a long time" >}}
 
 Possible causes for a Pod not being scheduled:
 
 - A container on the Pod requests a resource not available in the cluster
 - The Pod has affinity rules that do not match any available worker node
-- One of the containers mounts a volume provisioned in the availability zone (AZ) where no Kubernetes worker is available
+- One of the containers mounts a volume provisioned in an availability zone (AZ) where no Kubernetes worker is available
 
 {{< /details >}}
 
-{{< details "Symptom 2: Pod in `CreateContainerConfigError` status for a long time" >}}
+{{< details "Scenario 2: Pod in `CreateContainerConfigError` status for a long time" >}}
 
 Possible causes for a container not being created:
 
@@ -66,7 +84,7 @@ Possible causes for a container not being created:
 
 {{< /details >}}
 
-{{< details "Symptom 3: Database process fails to join the domain" >}}
+{{< details "Scenario 3: Database process fails to join the domain" >}}
 
 Upon startup, the main _engine_ container process communicates with the NuoDB Admin to register the database process with the domain and start it using the NuoDB binary.
 
@@ -79,7 +97,7 @@ Possible causes for unsuccessful startup during this phase are:
 
 {{< /details >}}
 
-{{< details "Symptom 4: Database process fails to join the database" >}}
+{{< details "Scenario 4: Database process fails to join the database" >}}
 
 Once started, a database process communicates with the rest of the database and executes an entry protocol.
 
@@ -91,7 +109,7 @@ Possible causes for unsuccessful startup during this phase are:
 
 {{< /details >}}
 
-{{< details "Symptom 5: An SM in `TRACKED` state for a long time" >}}
+{{< details "Scenario 5: An SM in `TRACKED` state for a long time" >}}
 
 The database state might be `AWAITING_ARCHIVE_HISTORIES_MSG` indicating that the database leader assignment is in progress.
 NuoDB Admin must collect archive history information from all provisioned archives on database cold start.
@@ -101,11 +119,11 @@ Possible causes for unsuccessful leader assignment:
 
 - Not all SMs have been scheduled by Kubernes or not all SM processes have started
 - Some of the SM pods are in `CrashLoopBackOff` state with long back-off
-- There is a _ghost_ archive metadata provisioned in the domain which is not served by an actual SM
+- There is a _defunct_ archive metadata provisioned in the domain which is not served by an actual SM
 
 {{< /details >}}
 
-{{< details "Symptom 6: An TE in `TRACKED` state for a long time" >}}
+{{< details "Scenario 6: An TE in `TRACKED` state for a long time" >}}
 
 A TE process joins the database via an entry node which is normally the first SM that goes to `RUNNING` state.
 NuoDB Admin performs synchronization tasks so that TEs are started after the entry node is available.
@@ -117,10 +135,10 @@ Possible causes for missing entry node:
 
 {{< /details >}}
 
-{{< details "Symptom 7: SM in `CONFIGURED:RECOVERING_JOURNAL` state for a long time" >}}
+{{< details "Scenario 7: SM in `CONFIGURED:RECOVERING_JOURNAL` state for a long time" >}}
 
-Upon startup, SM processes perform a journal recovery procedure by applying any transaction messages to the atoms.
-This involves extensive disk IO and may continue for a while depending on the backlog of messages and the number of atoms to which they are applied.
+Upon startup, SM processes perform a journal recovery.
+This may be time consuming if there are many journal entries to recover.
 The SM process reports the progress of the journal recovery which is displayed in `nuocmd show domain` output.
 
 Possible causes for slow journal recovery:

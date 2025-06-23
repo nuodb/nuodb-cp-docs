@@ -9,7 +9,7 @@ weight: 115
 toc: true
 seo:
   title: "" # custom title (optional)
-  description: "" # custom description (recommended)
+  description: "Domain resource desired state is out of sync" # custom description (recommended)
   canonical: "" # custom canonical URL (optional)
   noindex: false # false (default) or true
 ---
@@ -22,6 +22,24 @@ Domain release is out of sync.
 Domain resource desired state is out of sync.
 The coresponding domain Helm release install/upgrade operation failed to apply the latest Helm values.
 {{< /details >}}
+
+### Symptom
+
+To manually evaluate the conditions for this alert follow the steps below.
+
+Domain which desired state is out of sync will have the `Released` status condition set to `False`.
+List all out of sync domains.
+
+```sh
+JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[?(@.type=="Released")]}{@.type}={@.status}{"\n"}{end}{end}'
+kubectl get domain -o jsonpath="$JSONPATH" | grep "Released=False"
+```
+
+Inspect the domain `Released` condition message for more details.
+
+```sh
+kubectl get domain <name> -o jsonpath='{.status.conditions[?(@.type=="Released")]}' | jq
+```
 
 ## Impact
 
