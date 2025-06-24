@@ -28,7 +28,7 @@ For example, it is expected for a domain to have 3 AP replicas, but it has less 
 
 To manually evaluate the conditions for this alert follow the steps below.
 
-Domain which has a component with unready replicas will have the `Ready` status condition set to `False`.
+A domain, which has a component with unready replicas, will have the `Ready` status condition set to `False`.
 List all unready domains.
 
 ```sh
@@ -76,6 +76,7 @@ Possible causes for a Pod not being scheduled:
 - A container on the Pod requests a resource not available in the cluster
 - The Pod has affinity rules that do not match any available worker node
 - One of the containers mounts a volume provisioned in the availability zone (AZ) where no Kubernetes worker is available
+- A Persistent volume claim (PVC) created for this Pod has a storage class that may be misconfigured or unusable
 
 {{< /details >}}
 

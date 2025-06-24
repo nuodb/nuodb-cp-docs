@@ -27,7 +27,7 @@ The corresponding database Helm release install/upgrade operation failed to appl
 
 To manually evaluate the conditions for this alert follow the steps below.
 
-Database which desired state is out of sync will have the `Released` status condition set to `False`.
+A database, in which the desired state is out of sync, will have the `Released` status condition set to `False`.
 List all out of sync databases.
 
 ```sh
@@ -98,8 +98,8 @@ Possible causes for Helm chart not found:
 
 {{< details "Scenario 3: Helm chart resource create/update failure" >}}
 
-Helm operations are targeting the Kubernetes API server directly.
-Kubernetes API server and admission controllers are validating incoming resources and any errors will result in failure of the entire Helm operation.
+Helm operations make requests on the Kubernetes API server directly.
+Kubernetes API server and admission controllers validate the incoming resources and any errors will result in failure of the entire Helm operation.
 NuoDB Control Plane (CP) enforces extensive validation on NuoDB resources to prevent invalid configuration, however, there are other factors that result in Helm operation errors.
 
 Possible causes for resource creation/update failure:
@@ -109,10 +109,11 @@ Possible causes for resource creation/update failure:
 - The NuoDB operator doesn't have required RBAC permissions to create resources of a specific group-kind
 - There is a _ResourceQuota_ which limits a specific resource
 - A resource immutable field is updated during `helm upgrade` operation
+- Collisions on resources that exist in the cluster but are not managed by Helm and by NuoDB operator
 
 {{< /details >}}
 
-{{< callout context="caution" title="Exhausting resource sync attemts" icon="outline/alert-triangle" >}}
+{{< callout context="caution" title="Exhausting resource sync attempts" icon="outline/alert-triangle" >}}
 
 NuoDB operator will retry failed Helm operations with the configured retry count (`20` by default) and increasing backoff (starting at `60s` by default).
 Once the retries are exhausted, the Helm operation reconciliation will be suspended.
@@ -148,7 +149,7 @@ This failure happens even before invoking the Helm operation.
 ```json
 {
   "lastTransitionTime": "2025-06-10T09:32:08Z",
-  "message": "failed to reconcile database release acme-messaging-demo-zfb77wc: unable to process Secret default/acme-messaging-demo-zfb77wc-values: secrets \"acme-messaging-demo-zfb77wc-values\" is forbidden: exceeded quota: quota-account, requested: count/secrets=1, used: count/secrets=782, limited: count/secrets=782",
+  "message": "failed to reconcile database release acme-messaging-demo-zfb77wc: unable to process Secret default/acme-messaging-demo-zfb77wc-values: secrets \"acme-messaging-demo-zfb77wc-values\" is forbidden: exceeded quota: quota-account, requested: count/secrets=1, used: count/secrets=500, limited: count/secrets=500",
   "observedGeneration": 1,
   "reason": "ReconciliationFailed",
   "status": "False",

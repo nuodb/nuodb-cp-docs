@@ -23,14 +23,14 @@ Database resource has a component with replicas which were declared to be unread
 Database components impacted by this alert are Transaction Engines (TEs) and Storage Managers (SMs).
 For example, it is expected for a database to have 2 TE replicas, but it has less than that for a noticeable period of time.
 
-On rare occasions, there may be more replicas than request and the system did not clean them up.
+On rare occasions, there may be more replicas than requested and the system did not clean them up.
 {{< /details >}}
 
 ### Symptom
 
 To manually evaluate the conditions for this alert follow the steps below.
 
-Database which has a component with unready replicas will have the `Ready` status condition set to `False`.
+A database, which has a component with unready replicas, will have the `Ready` status condition set to `False`.
 List all unready databases.
 
 ```sh
@@ -72,6 +72,7 @@ Possible causes for a Pod not being scheduled:
 - A container on the Pod requests a resource not available in the cluster
 - The Pod has affinity rules that do not match any available worker node
 - One of the containers mounts a volume provisioned in an availability zone (AZ) where no Kubernetes worker is available
+- A Persistent volume claim (PVC) created for this Pod has a storage class that may be misconfigured or unusable
 
 {{< /details >}}
 

@@ -27,7 +27,7 @@ The coresponding domain Helm release install/upgrade operation failed to apply t
 
 To manually evaluate the conditions for this alert follow the steps below.
 
-Domain which desired state is out of sync will have the `Released` status condition set to `False`.
+A domain, in which the desired state is out of sync, will have the `Released` status condition set to `False`.
 List all out of sync domains.
 
 ```sh
@@ -46,7 +46,7 @@ kubectl get domain <name> -o jsonpath='{.status.conditions[?(@.type=="Released")
 Latest domain configuration is not enforced.
 
 New domain won't become available.
-Connectivity to already provisioned domains is not impacted by this issue, however, some features that require applying domain configuration changes migth be unavailable (e.g. start/stop domain, TLS rotation, etc.).
+Connectivity to already provisioned domains is not impacted by this issue, however, some features that require applying domain configuration changes might be unavailable (e.g. start/stop domain, TLS rotation, etc.).
 
 ## Diagnosis
 
@@ -56,7 +56,7 @@ Connectivity to already provisioned domains is not impacted by this issue, howev
 - List the Helm revisions for the Helm release associated with the domain.
 - Check the latest Helm values for the failed Helm release.
 - Check that Helm chart repository services are available.
-By default, the public NuoDB Helm charts [repository](https://nuodb.github.io/nuodb-helm-charts) in GitHub is used, however, this can be overriden.
+By default, the public NuoDB Helm charts [repository](https://nuodb.github.io/nuodb-helm-charts) in GitHub is used, however, this can be overridden.
 
 ### Scenarios
 
