@@ -33,7 +33,7 @@ jobs:
           name: Install dependencies
           command: npm ci
       - hugo/install:
-          version: 0.132.2
+          version: 0.151.2
       - run:
           name: "Build website"
           command: |

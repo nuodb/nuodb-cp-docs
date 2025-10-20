@@ -1,11 +1,11 @@
 const autoprefixer = require('autoprefixer');
-const purgecss = require('@fullhuman/postcss-purgecss');
+const { purgeCSSPlugin } = require('@fullhuman/postcss-purgecss');
 const whitelister = require('purgecss-whitelister');
 
 module.exports = {
     plugins: [
         autoprefixer(),
-        purgecss({
+        purgeCSSPlugin({
             content: ['./hugo_stats.json'],
             extractors: [
                 {
@@ -56,7 +56,8 @@ module.exports = {
                 'hiding',
                 'page-item',
                 'page-link',
-                ...whitelister(['./assets/scss/**/*.scss', './node_modules/@hyas/doks-core/assets/scss/components/_code.scss', './node_modules/@hyas/doks-core/assets/scss/components/_expressive-code.scss', './node_modules/@hyas/doks-core/assets/scss/common/_syntax.scss'])
+                'not-content',
+                ...whitelister(['./assets/scss/**/*.scss', './node_modules/@thulite/doks-core/assets/scss/components/_code.scss', './node_modules/@thulite/doks-core/assets/scss/components/_expressive-code.scss', './node_modules/@thulite/doks-core/assets/scss/common/_syntax.scss'])
             ]
         })
     ]
