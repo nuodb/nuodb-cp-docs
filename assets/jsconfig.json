@@ -2,7 +2,10 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "*": ["*", "..\\node_modules\\@hyas\\doks-core\\assets\\*"]
+      "*": [
+        "*",
+        "..\\node_modules\\@thulite\\doks-core\\assets\\*"
+      ]
     }
   }
 }

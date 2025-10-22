@@ -4,6 +4,10 @@
   "description": "NuoDB Control Plane documentation",
   "author": "NuoDB",
   "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nuodb/nuodb-cp-docs.git"
+  },
   "scripts": {
     "create": "hugo new",
     "dev": "hugo server --disableFastRender --noHTTPCache",
@@ -12,16 +16,18 @@
     "preview": "vite preview --outDir public"
   },
   "dependencies": {
-    "@hyas/doks-core": "^1.6.1",
-    "@hyas/images": "^3.2.0",
-    "@hyas/inline-svg": "^1.1.0",
-    "@hyas/seo": "^2.3.0",
-    "@tabler/icons": "^3.2.0",
-    "gethyas": "^2.4.2"
+    "@tabler/icons": "^3.34.1",
+    "@thulite/doks-core": "^1.8.3",
+    "@thulite/images": "^3.3.3",
+    "@thulite/inline-svg": "^1.2.0",
+    "@thulite/seo": "^2.4.2",
+    "thulite": "^2.6.3"
   },
   "devDependencies": {
-    "prettier": "^3.2.5",
-    "vite": "^5.2.10"
+    "@changesets/changelog-github": "^0.5.1",
+    "@changesets/cli": "^2.29.5",
+    "prettier": "^3.6.2",
+    "vite": "^7.0.6"
   },
   "engines": {
     "node": ">=20.11.0"
