@@ -1,0 +1,368 @@
+---
+title: "Rollout Configuration Changes"
+description: ""
+summary: ""
+date: 2025-10-21T09:30:00+03:00
+lastmod: 2025-10-21T09:30:00+03:00
+draft: false
+weight: 315
+toc: true
+seo:
+  title: "" # custom title (optional)
+  description: "" # custom description (recommended)
+  canonical: "" # custom canonical URL (optional)
+  noindex: false # false (default) or true
+---
+
+NuoDB DBaaS manages NuoDB databases at scale and automates certain aspects of the database lifecycle.
+A pre-defined database configuration preset in the form of [service tiers]({{< ref "./service-tiers.md" >}}) allows users to have control over fully supported and well-documented database properties only.
+Such a reusable configuration provides convenience for the users but requires extra planning when a configuration change is made since this will affect many databases.
+
+NuoDB DBaaS supports delivering configuration changes progressively to domain and database resources.
+This allows any configuration updates to be delivered in a controlled way defined by NuoDBaaS operations best practices and enforced using rollout templates.
+
+## Canary rollout
+
+The `CanaryRollout` custom resource is a job for rolling out a change progressively to a group of `Domain` and `Database` resources.
+A [JSON merge patch](https://datatracker.ietf.org/doc/html/rfc7386) represents the decired configuration change to resources matched by a label selector.
+The canary rollout is either created automatically by the system, manually using `kubectl` or via REST API [/cluster/canaryrollouts](https://nuodb.github.io/nuodb-cp-releases/api-doc/#put-/cluster/canaryrollouts/-name-) cluster-scoped resource.
+
+## Canary rollout template
+
+The `CanaryRolloutTemplate` custom resource is reusable configuration defining the rollout strategy.
+It is referenced by a `CanaryRollout` resource and together they describe how a specific configuration change is delivered to selected targets.
+
+Each template define steps executed sequentially.
+If any of the steps fail, the canary rollout is stopped and marked as failed.
+
+### Promote step
+
+The _promote_ step defines the target resources to which a change is promoted in parallel and the rollback behaviour in case of failed analysis.
+Various selectors and filters limit the promote targets such as label selector, number of targets, percentage of total targets, etc.
+
+{{< callout context="note" title="Note" icon="outline/info-circle" >}}
+There is no implicit _promote_ step for canary templates.
+For a change to be propagated to a specific target, the target must match one of the explicitly configured _promote_ steps.
+{{< /callout >}}
+
+### Analysis step
+
+The analysis step defines the type of analysis run to be performed on target resources after a changed has been rolled out.
+An analysis run is executed in parallel on all targets promoted from the last _promote_ step.
+If at least one analysis run fails for some of the targets, the canary rollout is stopped.
+Multiple analysis may be defined globally and executed after each _promote_ step.
+
+### Pause step
+
+The _pause_ step defines duration for which the canary rollout must be paused.
+A zero (0) duration pauses the rollout until it is manually approved.
+
+To manually resume paused canary rollout, update the `Paused` condition reason to `CanaryManuallyApproved` using `kubectl` directly or through the REST API.
+
+{{< tabs "approve-paused-rollout" >}}
+{{< tab "nuodb-cp" >}}
+
+```sh
+nuodb-cp httpclient PATCH cluster/canaryrollouts/acme-upgrade \
+  --query-param updateStatus=true \
+  -d '[{
+    "op": "replace",
+    "path": "/status/conditions",
+    "value": [{
+    "type": "Paused",
+    "status": "True",
+    "reason": "CanaryManuallyApproved",
+    "message": "",
+    "lastTransitionTime": "'$(date +"%Y-%m-%dT%H:%M:%SZ")'"
+  }]}]'
+```
+
+{{< /tab >}}
+{{< tab "kubectl" >}}
+
+```sh
+kubectl patch canaryrollout <name> \
+ --subresource status \
+  --type merge \
+  --patch '{"status": {"conditions": [{
+      "type": "Paused",
+      "status": "True",
+      "reason": "CanaryManuallyApproved",
+      "message": "",
+      "lastTransitionTime": "'$(date +"%Y-%m-%dT%H:%M:%SZ")'"
+  }]}}'
+```
+
+{{< /tab >}}
+{{< /tabs >}}
+
+## Monitoring rollout progress
+
+NuoDB operator creates Kubernetes events for the canary rollout execution trace.
+Use `kubectl events --for canaryrollout/<name>` to monitor the status of the rollout.
+
+An example canary rollout execution log is available below.
+
+```text
+LAST SEEN   TYPE     REASON                       OBJECT                       MESSAGE
+22m         Normal   CanaryPauseStep              CanaryRollout/acme-upgrade   Pause step (1/13) activated: canary rollout paused until manual approval
+21m         Normal   CanaryManuallyApproved       CanaryRollout/acme-upgrade   Pause step (1/13) manually approved after -1h59m59.509203822s
+21m         Normal   Progressing                  CanaryRollout/acme-upgrade   Step (1/13) completed
+21m         Normal   CanaryPromoteStep            CanaryRollout/acme-upgrade   Promote step (2/13) progressing target Domain default/acme-messaging
+21m         Normal   CanaryPromoteStep            CanaryRollout/acme-upgrade   Promote step (2/13) progressing target Database default/acme-messaging-demo
+16m         Normal   CanaryAnalysisRunSucceeded   CanaryRollout/acme-upgrade   Analysis step (2/13) analysis "ready" succeed for target Domain default/acme-messaging
+16m         Normal   CanaryAnalysisRunSucceeded   CanaryRollout/acme-upgrade   Analysis step (2/13) analysis "ready" succeed for target Database default/acme-messaging-demo
+16m         Normal   Progressing                  CanaryRollout/acme-upgrade   Step (2/13) completed
+16m         Normal   CanaryPromoteStep            CanaryRollout/acme-upgrade   Promote step (3/13) matches no targets
+16m         Normal   Progressing                  CanaryRollout/acme-upgrade   Step (3/13) completed
+16m         Normal   CanaryPauseStep              CanaryRollout/acme-upgrade   Pause step (4/13) activated: canary rollout paused for 5m0s
+11m         Normal   CanaryPauseStep              CanaryRollout/acme-upgrade   Pause step (4/13) resuming rollout after 5m1s
+11m         Normal   Progressing                  CanaryRollout/acme-upgrade   Step (4/13) completed
+11m         Normal   CanaryPromoteStep            CanaryRollout/acme-upgrade   Promote step (5/13) matches no targets
+...
+```
+
+The current state for pending analysis runs is recorded for each promoted target in `status.lastPromotedTargets[*].analysisRuns`.
+
+{{< callout context="note" title="Note" icon="outline/info-circle" >}}
+Since canary rollouts may run for long time before complete, it is recommended to collect and store Kubernetes events in external system (e.g. Grafana Loki) for long term storage.
+{{< /callout >}}
+
+## Use cases
+
+The canary rollout resources are the main building blocks for delivering any change progressively, however, let's focus on two main use cases described in this section.
+
+### Changes in service tiers
+
+The NuoDB service tiers and Helm features are versioned resources, which means that a configuration history is maintained for them by the NuoDB operator.
+A new configuration version, called _revision_, is created on every update of the resource's desired specification.
+Configuration revisions are referenced in other resources, such as the domain or database.
+If an explicit revision is not pinned in a reference, then the _latest_ revision is used.
+A revision that is not in use or is not the _latest_ is automatically removed from the version history.
+For example, a new service tier revision is created when either a service tier's desired spec is modified or a referenced Helm feature's desired spec is modified.
+
+Keeping version history of shared configuration and explicitly referencing these revisions allows decoupling the database lifecycle from the configuration lifecycle.
+NuoDB DBaaS supports both manual and automatic revision rollout to selected target resources.
+
+To enable automatic rollout of service tier revisions, set the `spec.updateStrategy.type` field to `CanaryRollout` and configure the `CanaryRolloutTemplate` custom resource reference in `spec.updateStrategy.canary.templateRef.name`.
+If enabled, the NuoDB operator will manage the lifecycle of `CanaryRollout` resources, which kicks in the automatic rollout of new service tier revisions to all Domain and Database resources that reference them.
+
+{{< callout context="note" title="Note" icon="outline/info-circle" >}}
+The _nuodb-cp-config_ Helm chart allows you to enable automatic rollout for all standard service tiers by setting the `cpConfig.service.type.updateStrategy.type` and `cpConfig.service.type.updateStrategy.canary.template` Helm values.
+{{< /callout >}}
+
+The diagram below illustrates a successful automatic configuration rollout triggered by a change in a Helm feature.
+The example is simplified and has one Helm feature, one service tier, and two databases for demonstration purposes.
+Multiple controllers in the NuoDB operator are responsible for progressively rolling out the change in the Helm feature to both databases.
+
+{{< picture src="canary-success-flow.png" alt="Canary rollout success flow" >}}
+
+In case the analysis defined in the `CanaryRolloutTemplate` fail for some of the target databases, the rollout will stop, and that database will be rolled back to the previous service tier revision.
+
+{{< callout context="note" title="Note" icon="outline/info-circle" >}}
+Depending on the canary template configuration, multiple databases may be updated at once.
+By default, a rollback will be performed only for the databases with failed analysis.
+{{< /callout >}}
+
+{{< picture src="canary-rollback-flow.png" alt="Canary rollout rollback flow" >}}
+
+### Example: Service tier rollout
+
+The below canary template defines a progressive rollout strategy for service tier change to 2, 10%, 40% and 100% of domains and databases with _prod_ SLA.
+After each promotion, the rollout will make sure that the resources are _synced_ and _ready_ by running status condition analysis.
+
+```yaml
+apiVersion: cp.nuodb.com/v1beta1
+kind: CanaryRolloutTemplate
+metadata:
+  name: example-tier-update
+spec:
+  analysis:
+  - name: "ready"
+    interval: 5m
+    checkStatusCondition:
+      type: Ready
+      status: "True"
+      timeout: 15m
+  - name: "synced"
+    interval: 1m
+    checkStatusCondition:
+      type: Released
+      status: "True"
+      timeout: 5m
+  steps:
+  # Promote to 2 PROD domains/databases
+  - promoteTo:
+      labelSelector:
+        matchLabels:
+          cp.nuodb.com/sla: prod
+      limitCount: 2
+
+  # Promote to 10% of the PROD domains/databases
+  - promoteTo:
+      labelSelector:
+        matchLabels:
+          cp.nuodb.com/sla: prod
+      limitPercentage: 10
+
+  # Promote to 40% of the PROD domains/databases
+  - promoteTo:
+      labelSelector:
+        matchLabels:
+          cp.nuodb.com/sla: prod
+      limitPercentage: 40
+
+  # Promote to the rest of the domains/databases
+  - promoteTo: {}
+```
+
+### Product version upgrade
+
+Canary rollouts are used to promote new NuoDB product releases with confidence by progressively delivering it across selected databases.
+DBaaS administrators maintain reusable rollout templates for minor version upgrades.
+The operations team references them in a canary rollout job for a specific NuoDB release and monitors its progress across a fleet of databases.
+
+{{< callout context="caution" title="NuoDB protocol version upgrade" icon="outline/alert-triangle" >}}
+NuoDB [database protocol version upgrade](https://doc.nuodb.com/nuodb/latest/deployment-models/physical-or-vmware-environments-with-nuodb-admin/installing-nuodb/upgrade-to-a-new-release/upgrade-the-database-protocol/#nav-container-toggle) is not automatically performed when rolling out a new NuoDB version.
+It must be planned accordingly and performed as an additional manual step.
+{{< /callout >}}
+
+If the new version is promoted to a domain and its databases by the same _promote_ step, the NuoDB operator will ensure that the domain is upgraded before the databases.
+This reduces the number of NuoDB processes that are shut down at the same time and reduces the risk of cascading failures.
+
+### Example: Minor version upgrade
+
+The below canary template defines an upgrade strategy by progressively promoting a new version to 2, 30% and 100% of domains and databases with _dev_ SLA.
+After that the rollout is paused until manual approval.
+Once the approval is given, the version is promoted to 2, 10%, 40% and 100% of production domains and databases.
+
+```yaml
+apiVersion: cp.nuodb.com/v1beta1
+kind: CanaryRolloutTemplate
+metadata:
+  name: example-version-upgrade
+spec:
+  skipDisabled: true
+  analysis:
+  - name: upgrading
+      interval: 5s
+      checkStatusCondition:
+        type: Upgrading
+        status: "True"
+        timeout: 30m
+  steps:
+  # Promote to 2 DEV domains/databases
+  - promoteTo:
+      labelSelector:
+        matchLabels:
+          cp.nuodb.com/sla: dev
+      limitCount: 2
+  - analysis:
+      name: ready
+      interval: 5m
+      checkStatusCondition:
+        type: Ready
+        status: "True"
+        timeout: 30m
+
+  # Promote to 2 DEV domains/databases
+  - promoteTo:
+      labelSelector:
+        matchLabels:
+          cp.nuodb.com/sla: dev
+      limitPercentage: 30
+  - analysis:
+      name: ready
+      interval: 5m
+      checkStatusCondition:
+        type: Ready
+        status: "True"
+        timeout: 30m
+
+  # Promote to the rest of DEV domains/databases
+  - promoteTo:
+      labelSelector:
+        matchLabels:
+          cp.nuodb.com/sla: dev
+  - analysis:
+      name: ready
+      interval: 5m
+      checkStatusCondition:
+        type: Ready
+        status: "True"
+        timeout: 30m
+
+  # Wait until manually approved
+  - pause: {}
+
+  # Promote to 2 PROD domains/databases
+  - promoteTo:
+      labelSelector:
+        matchLabels:
+          cp.nuodb.com/sla: prod
+      limitCount: 2
+  - analysis:
+      name: ready
+      interval: 5m
+      checkStatusCondition:
+        type: Ready
+        status: "True"
+        timeout: 30m
+
+  # Promote to 10% of the PROD domains/databases
+  - promoteTo:
+      labelSelector:
+        matchLabels:
+          cp.nuodb.com/sla: prod
+      limitPercentage: 10
+  - analysis:
+      name: ready
+      interval: 5m
+      checkStatusCondition:
+        type: Ready
+        status: "True"
+        timeout: 30m
+
+  # Promote to 40% of the PROD domains/databases
+  - promoteTo:
+      labelSelector:
+        matchLabels:
+          cp.nuodb.com/sla: prod
+      limitPercentage: 40
+  - analysis:
+      name: ready
+      interval: 5m
+      checkStatusCondition:
+        type: Ready
+        status: "True"
+        timeout: 30m
+
+  # Promote to the rest of the domains/databases
+  - promoteTo: {}
+  - analysis:
+      name: ready
+      interval: 5m
+      checkStatusCondition:
+        type: Ready
+        status: "True"
+        timeout: 30m
+```
+
+The template is referenced in the canary rollouts for different versions.
+For example, the below canary rollout upgrades all databases in organization `acme` to NuoDB 7.0.3.
+
+```yaml
+apiVersion: cp.nuodb.com/v1beta1
+kind: CanaryRollout
+metadata:
+  name: acme-upgrade-703
+spec:
+  patch:
+    spec:
+      version: 7.0.3
+  rolloutTemplate:
+    name: example-version-upgrade
+  selector:
+    matchLabels:
+      cp.nuodb.com/organization: "acme"
+```
