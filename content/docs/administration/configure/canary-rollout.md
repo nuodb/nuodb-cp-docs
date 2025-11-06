@@ -5,7 +5,7 @@ summary: ""
 date: 2025-10-21T09:30:00+03:00
 lastmod: 2025-10-21T09:30:00+03:00
 draft: false
-weight: 315
+weight: 255
 toc: true
 seo:
   title: "" # custom title (optional)
