@@ -16,7 +16,6 @@ DOCS_DIR := $(PROJECT_DIR)/content/docs
 CP_VERSION ?= 2.9.2
 CP_CLIDOC := nuodb-cp.adoc
 CP_CLIDOC_FILE := https://github.com/nuodb/nuodb-cp-releases/releases/download/v$(CP_VERSION)/$(CP_CLIDOC)
-CP_CRD_CHART := https://github.com/nuodb/nuodb-cp-releases/releases/download/v$(CP_VERSION)/nuodb-cp-crd-$(CP_VERSION).tgz
 
 # NuoDB Control Plane Git repository and revision
 CP_REPO ?= github.com/nuodb/nuodb-control-plane
@@ -64,16 +63,24 @@ generate-cli-docs: # Generates reference pages for nuodb-cp CLI tool
 			"Command-line interface for the NuoDB Control Plane REST Service" "911"
 
 .PHONY: generate-crd-docs
-generate-crd-docs: $(CRD_DOCS) $(CP_REPO_DIR) # Generates CRDs reference pages
-	cd $(CP_REPO_DIR) && git fetch --all && git checkout $(CP_COMMIT) && cd - \
-		&& $(CRD_DOCS) --source-path=$(CP_REPO_DIR)/operator/api/v1beta1 \
-			--config=.crdrefdocs.yaml \
-			--renderer=markdown \
-			--output-mode=group \
-			--output-path $(DOCS_DIR)/reference \
+generate-crd-docs: $(CRD_DOCS) $(CP_REPO_DIR) generate-crd-samples # Generates CRDs reference pages
+	cd $(CP_REPO_DIR) && git fetch --all && git checkout $(CP_COMMIT) && cd -
+	$(CRD_DOCS) --source-path=$(CP_REPO_DIR)/operator/api/v1beta1 \
+		--config=.crdrefdocs.yaml \
+		--renderer=markdown \
+		--templates-dir=hack/crd-templates \
+		--output-mode=group \
+		--output-path $(DOCS_DIR)/reference \
 		&& hack/add_frontmatter.sh $(DOCS_DIR)/reference/cp.nuodb.com.md \
 			"NuoDB CRDs Reference" \
 			"Custom resource definitions (CRDs) for NuoDB Control Plane operator" "912"
+
+.PHONY: generate-crd-samples
+generate-crd-samples: $(CP_REPO_DIR) # Generate CRD samples
+	cd $(CP_REPO_DIR) && git fetch --all && git checkout $(CP_COMMIT) && cd -
+	hack/generate_samples.py --source-dir $(CP_REPO_DIR)/operator/config/crd/bases \
+		--start-weight 950 \
+		--output-dir $(DOCS_DIR)/reference/samples
 
 # Targets for downloading tools used by other targets
 ifeq ($(shell uname -m), $(filter $(shell uname -m), arm64 aarch64))

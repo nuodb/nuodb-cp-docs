@@ -35,6 +35,11 @@ jobs:
       - hugo/install:
           version: 0.151.2
       - run:
+          name: Install asciidoctor
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y asciidoctor
+      - run:
           name: "Build website"
           command: |
             # Inject custom javascript

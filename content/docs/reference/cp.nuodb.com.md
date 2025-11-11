@@ -11,7 +11,6 @@ seo:
   canonical: "" # custom canonical URL (optional)
   noindex: false # false (default) or true
 ---
-
 ## Packages
 - [cp.nuodb.com/v1beta1](#cpnuodbcomv1beta1)
 
@@ -218,6 +217,8 @@ _Appears in:_
 
 CanaryRollout is the Schema for the canaryrollouts API.
 
+[Example]({{< ref "samples/cp.nuodb.com_canaryrollout.md" >}})
+
 
 
 
@@ -317,6 +318,8 @@ _Appears in:_
 
 
 CanaryRolloutTemplate is the Schema for the canaryrollouttemplates API.
+
+[Example]({{< ref "samples/cp.nuodb.com_canaryrollouttemplate.md" >}})
 
 
 
@@ -451,6 +454,8 @@ _Appears in:_
 
 Database is the Schema for the databases API
 
+[Example]({{< ref "samples/cp.nuodb.com_database.md" >}})
+
 
 
 
@@ -468,6 +473,8 @@ Database is the Schema for the databases API
 
 
 DatabaseBackup is the Schema for the databasebackups API
+
+[Example]({{< ref "samples/cp.nuodb.com_databasebackup.md" >}})
 
 
 
@@ -504,6 +511,8 @@ _Appears in:_
 
 
 DatabaseBackupPolicy is the Schema for the databasebackuppolicies API
+
+[Example]({{< ref "samples/cp.nuodb.com_databasebackuppolicy.md" >}})
 
 
 
@@ -620,6 +629,8 @@ _Appears in:_
 
 DatabaseQuota is the Schema for the databasequota API
 
+[Example]({{< ref "samples/cp.nuodb.com_databasequota.md" >}})
+
 
 
 
@@ -704,6 +715,8 @@ _Appears in:_
 
 Domain is the Schema for the domains API
 
+[Example]({{< ref "samples/cp.nuodb.com_domain.md" >}})
+
 
 
 
@@ -763,6 +776,8 @@ _Appears in:_
 
 HelmApp is the Schema for the helmapps API
 
+[Example]({{< ref "samples/cp.nuodb.com_helmapp.md" >}})
+
 
 
 
@@ -817,6 +832,8 @@ _Appears in:_
 
 
 HelmFeature is the Schema for the helmfeatures API
+
+[Example]({{< ref "samples/cp.nuodb.com_helmfeature.md" >}})
 
 
 
@@ -911,6 +928,8 @@ _Appears in:_
 
 
 IdentityProvider is the Schema for the identityproviders API.
+
+[Example]({{< ref "samples/cp.nuodb.com_identityprovider.md" >}})
 
 
 
@@ -1032,6 +1051,8 @@ _Appears in:_
 
 Metric is the Schema for the metrics API.
 
+[Example]({{< ref "samples/cp.nuodb.com_metric.md" >}})
+
 
 
 
@@ -1089,6 +1110,8 @@ _Appears in:_
 
 
 MetricSource is the Schema for the metricsources API.
+
+[Example]({{< ref "samples/cp.nuodb.com_metricsource.md" >}})
 
 
 
@@ -1589,6 +1612,8 @@ _Appears in:_
 
 RoleTemplate is the Schema for the roletemplates API.
 
+[Example]({{< ref "samples/cp.nuodb.com_roletemplate.md" >}})
+
 
 
 
@@ -1689,6 +1714,8 @@ _Appears in:_
 
 
 ServiceTier is the Schema for the servicetiers API
+
+[Example]({{< ref "samples/cp.nuodb.com_servicetier.md" >}})
 
 
 
