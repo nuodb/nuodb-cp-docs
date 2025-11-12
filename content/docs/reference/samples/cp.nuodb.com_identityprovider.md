@@ -16,7 +16,7 @@ seo:
 
 ```yaml
 # Standard Kubernetes API Version declaration.
-apiVersion: cp.nuodb.com/v1
+apiVersion: cp.nuodb.com/v1beta1
 # Standard Kubernetes Kind declaration.
 kind: IdentityProvider
 # Standard Kubernetes metadata.
@@ -43,7 +43,7 @@ spec:
 
 ```yaml
 # Standard Kubernetes API Version declaration.
-apiVersion: cp.nuodb.com/v1
+apiVersion: cp.nuodb.com/v1beta1
 # Standard Kubernetes Kind declaration.
 kind: IdentityProvider
 # Standard Kubernetes metadata.

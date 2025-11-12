@@ -202,13 +202,15 @@ def write_schema(schema, indent=2, minimal=False, field_name=None):
 def generate_cr_sample(crd, include_status=False, minimal=False):
     if 'spec' not in crd or 'versions' not in crd['spec'] or not crd['spec']['versions']:
         raise ValueError("CRD missing spec or versions")
+    # Support only one version for now
+    version_name = crd['spec']['versions'][0]['name']
     version_schema = crd['spec']['versions'][0]['schema'].get('openAPIV3Schema', {})
     group = crd['spec']['group']
     kind = crd['spec']['names']['kind']
 
     lines = []
     lines.append("# Standard Kubernetes API Version declaration.")
-    lines.append(f"apiVersion: {group}/v1")
+    lines.append(f"apiVersion: {group}/{version_name}")
     lines.append("# Standard Kubernetes Kind declaration.")
     lines.append(f"kind: {kind}")
     lines.append("# Standard Kubernetes metadata.")
