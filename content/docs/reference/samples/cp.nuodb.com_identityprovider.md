@@ -27,6 +27,21 @@ metadata:
   namespace: default
 # Specification of the desired behavior of the IdentityProvider.
 spec:
+  # Specification for the OpenID Connect (OIDC) provider.
+  oidc:
+    # The client ID to use for the OIDC provider.
+    clientId:
+      # If specified, the value to use.
+      value: string
+    # The Secret resource reference to the client secret to use for the
+    # OIDC provider.
+    clientSecret:
+      # The key of the value within the Secret resource.
+      key: string
+      # The name of the Secret resource to obtain the value from.
+      name: string
+    # The URL of the OIDC provider.
+    issuerUrl: string
   # Rules for resolving the user to provision in the NuoDB Control Plane
   # bound to the user authenticated by the external provider. If the user
   # with the resolved organization and name does not exist, then one will
@@ -35,8 +50,12 @@ spec:
   provisionUser:
     # Resolver for the user name.
     name:
+      # If specified, the value to use.
+      value: string
     # Resolver for the organization the user belongs to.
     organization:
+      # If specified, the value to use.
+      value: string
 ```
 
 ## Extended example

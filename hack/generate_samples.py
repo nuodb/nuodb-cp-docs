@@ -8,6 +8,8 @@ import argparse
 import os
 import sys
 import yaml
+import re
+import traceback
 
 template = """---
 title: "{kind}"
@@ -162,40 +164,74 @@ def value_for_schema(schema, field_name=None, parent_field_name=None):
         return {}
     return "value"
 
-def write_schema(schema, indent=2, minimal=False, field_name=None):
+def match_cel(schema, pattern):
+    if cel := schema.get('x-kubernetes-validations', []):
+        for exp in cel:
+            if match := re.search(pattern, exp['message']):
+                return match
+
+# Include any fields that are optional but must be generated in a minimal CR
+REQUIRED_FIELDS = {
+    'DatabaseBackup' : ['spec.source.databaseRef'],
+    'CanaryRolloutTemplate' : ['spec.steps', 'spec.steps.promoteTo'],
+    'DatabaseQuota' : ['spec.hard'],
+    'HelmFeature' : ['spec.values'],
+    'Metric' : ['spec.metrics'],
+    'ServiceTier' : ['spec.features']
+}
+
+def write_schema(schema, kind=None, indent=2, minimal=False, field_name=None, field_path=None):
     lines = []
     indent_str = ' ' * indent
     if not schema or 'properties' not in schema:
         return lines
     required_fields = set(schema.get('required', [])) if minimal else None
+    required_paths = REQUIRED_FIELDS.get(kind, [])
 
     for k in sorted(schema['properties']):
-        if minimal and k not in required_fields:
-            continue
+        if minimal:
+            # Determine if special CEL validation contraints are applied
+            if match := match_cel(schema, r"Exactly one of '([^']*)'.*"):
+                # Make the first field from a set of mutually exclusive fields
+                # required
+                required_fields.add(match.group(1))
+            # Determine if the field is explicitly required
+            if f'{field_path}.{k}' in required_paths:
+                required_fields.add(k)
+            if k not in required_fields:
+                # Skip this field
+                continue
         prop = schema['properties'][k]
         if 'description' in prop:
             for desc_line in prop['description'].splitlines():
                 lines.append(f"{indent_str}# {desc_line.strip()}")
 
         t = resolve_type(prop)
+        next_field_path = f'{field_path}.{k}' if field_path else k
+        val = value_for_schema(prop, field_name=k, parent_field_name=field_name)
         if 'object' in t:
             lines.append(f"{indent_str}{k}:")
+            nlines = len(lines)
             if 'properties' in prop and prop['properties']:
-                lines.extend(write_schema(prop, indent+2, minimal, field_name=k))
-            else:
-                val = value_for_schema(prop, field_name=k, parent_field_name=field_name)
+                lines.extend(write_schema(
+                    prop, kind=kind, indent=indent+2, minimal=minimal,
+                    field_name=k, field_path=next_field_path))
+            if nlines == len(lines):
                 lines.append(f"{indent_str}  {val}")
         elif 'array' in t:
             lines.append(f"{indent_str}{k}:")
             item = prop.get('items', {})
             item_type = resolve_type(item)
+            nlines = len(lines)
             if 'object' in item_type:
                 lines.append(f"{indent_str}-")
-                lines.extend(write_schema(item, indent+2, minimal, field_name=k))
+                lines.extend(write_schema(
+                    item, kind=kind, indent=indent+2, minimal=minimal, field_name=k, field_path=next_field_path))
             else:
                 lines.append(f"{indent_str}- {value_for_schema(item, field_name=k, parent_field_name=field_name)}")
+            if nlines == len(lines):
+                lines.append(f"{indent_str}{val}")
         else:
-            val = value_for_schema(prop, field_name=k, parent_field_name=field_name)
             lines.append(f"{indent_str}{k}: {val}")
     return lines
 
@@ -224,14 +260,18 @@ def generate_cr_sample(crd, include_status=False, minimal=False):
     if spec_schema:
         lines.append(f"# Specification of the desired behavior of the {kind}.")
         lines.append("spec:")
-        lines.extend(write_schema(spec_schema, indent=2, minimal=minimal, field_name='spec'))
+        lines.extend(write_schema(
+            spec_schema, kind=kind, indent=2, minimal=minimal,
+            field_name='spec', field_path='spec'))
 
     if include_status:
         status_schema = version_schema.get('properties', {}).get('status')
         if status_schema:
             lines.append(f"# Current observed status of the {kind}.")
             lines.append("status:")
-            lines.extend(write_schema(status_schema, indent=2, minimal=minimal, field_name='status'))
+            lines.extend(write_schema(
+                status_schema, kind=kind, indent=2, minimal=minimal,
+                field_name='status', field_path='spec'))
 
     return "\n".join(lines)
 
@@ -253,6 +293,7 @@ def main():
             extended_sample_yaml = generate_cr_sample(crd, include_status=True, minimal=False)
         except Exception as e:
             print(f"Failed generating sample for {crd_file}: {e}", file=sys.stderr)
+            print(traceback.format_exc())
             continue
         kind = crd['spec']['names']['kind']
         group = crd['spec']['group']

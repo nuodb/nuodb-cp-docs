@@ -30,6 +30,9 @@ spec:
   # Canary rollout steps for this template.
   steps:
   -
+    # Promote the change to group of targets.
+    promoteTo:
+      {}
 ```
 
 ## Extended example

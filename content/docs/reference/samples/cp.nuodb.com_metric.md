@@ -27,6 +27,18 @@ metadata:
   namespace: default
 # Specification of the desired behavior of the Metric.
 spec:
+  # A list of metric descriptors.
+  metrics:
+  -
+    # The name of the metric.
+    name: string
+    # Prometheus specific metric configuration.
+    prometheus:
+      # The Prometheus query string using Prometheus Query Language (PromQL).
+      # More info: https://prometheus.io/docs/prometheus/latest/querying/basics/
+      query: string
+    # The units in which the metric value is reported.
+    unit: string
 ```
 
 ## Extended example

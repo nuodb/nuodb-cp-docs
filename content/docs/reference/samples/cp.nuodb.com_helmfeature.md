@@ -27,6 +27,9 @@ metadata:
   namespace: default
 # Specification of the desired behavior of the HelmFeature.
 spec:
+  # The Helm values that enable the feature.
+  values:
+    {}
 ```
 
 ## Extended example

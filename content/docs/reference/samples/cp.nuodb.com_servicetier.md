@@ -27,6 +27,11 @@ metadata:
   namespace: default
 # Specification of the desired behavior of the ServiceTier.
 spec:
+  # The list of Helm features enabled for this service tier.
+  features:
+  -
+    # The name of the resource.
+    name: string
 ```
 
 ## Extended example

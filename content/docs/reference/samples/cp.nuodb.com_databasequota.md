@@ -27,6 +27,9 @@ metadata:
   namespace: default
 # Specification of the desired behavior of the DatabaseQuota.
 spec:
+  # The set of desired hard limits for each named resource.
+  hard:
+    {}
 ```
 
 ## Extended example

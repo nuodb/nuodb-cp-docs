@@ -30,6 +30,13 @@ spec:
   # Source holds information about the actual backup. This field is immutable
   # after creation.
   source:
+    # A reference to the Database object from which a backup should be created.
+    # This database is assumed to be in the same namespace as the
+    # DatabaseBackup object. This field should be set if the backup does not
+    # exists, and needs to be created. This field is immutable after creation.
+    databaseRef:
+      # Name of the referent
+      name: database
 ```
 
 ## Extended example
