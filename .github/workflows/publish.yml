@@ -40,6 +40,9 @@ jobs:
             && sudo dpkg -i ${{ runner.temp }}/hugo.deb
       - name: Install Dart Sass
         run: sudo snap install dart-sass
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.4.7
       - name: Install asciidoctor
         uses: reitzig/actions-asciidoctor@v2.0.2
         with:
