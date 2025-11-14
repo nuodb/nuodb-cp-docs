@@ -50,6 +50,7 @@ If you want to contribute documentation content, we recommend building and testi
 
 - [Hugo](https://gohugo.io/installation/) v0.132 or later
 - [Node.js](https://nodejs.org/en/download/package-manager) v12.16.2 or later
+- [Asciidoctor](https://docs.asciidoctor.org/asciidoctor/latest/install/) v2.0.26 or later
 
 ### Authoring Content
 

@@ -1,0 +1,258 @@
+---
+title: "Domain"
+description: "A sample Domain object with fields documented"
+summary: ""
+draft: false
+weight: 956
+toc: true
+seo:
+  title: "" # custom title (optional)
+  description: "" # custom description (recommended)
+  canonical: "" # custom canonical URL (optional)
+  noindex: false # false (default) or true
+---
+
+## Minimal example
+
+```yaml
+# Standard Kubernetes API Version declaration.
+apiVersion: cp.nuodb.com/v1beta1
+# Standard Kubernetes Kind declaration.
+kind: Domain
+# Standard Kubernetes metadata.
+metadata:
+  # Sample name. May be any valid Kubernetes object name.
+  name: sample-domain
+  # Namespace where the resource will be created.
+  namespace: default
+# Specification of the desired behavior of the Domain.
+spec:
+  # Domain instance service type
+  type:
+    # The service instance SLA type
+    sla: prod
+    # The service instance tier type
+    tierRef:
+      # The name of the resource.
+      name: tier
+  # NuoDB image version used for the domain
+  version: 7.0.2
+```
+
+## Extended example
+
+```yaml
+# Standard Kubernetes API Version declaration.
+apiVersion: cp.nuodb.com/v1beta1
+# Standard Kubernetes Kind declaration.
+kind: Domain
+# Standard Kubernetes metadata.
+metadata:
+  # Sample name. May be any valid Kubernetes object name.
+  name: sample-domain
+  # Namespace where the resource will be created.
+  namespace: default
+# Specification of the desired behavior of the Domain.
+spec:
+  # The Helm Chart source
+  chart:
+    # The Helm chart name available in the remote repository.
+    name: string
+    # Whether to pin the Helm chart version to the latest version currently
+    # available in the Helm repository so that future reconciliations doesn't
+    # automatically pick up new Helm chart version. This is used only if the
+    # Helm chart version is set to empty string ("") which represents the
+    # user's intent to use the latest chart version.
+    pinLatestVersion: true
+    # A https URL to a Helm repo to download the chart from.
+    repository: string
+    # The version of the chart or semver constraint of the chart to find.
+    version: 7.0.2
+  # The maintenance configuration for the domain.
+  maintenance:
+    # The time at which to mark the domain or database as being disabled.
+    expiresAtTime: 2025-11-11T21:30:40.971508Z
+    # The time delta until the domain or database is marked as being
+    # disabled. This value is used to calculate the ExpiresAtTime value
+    # that is injected by the controller on creation or update.
+    expiresIn: 1d
+    # Whether to disable the domain or database by scaling down all
+    # associated workloads to replicas=0.
+    isDisabled: False
+    # Whether to gracefully shutdown domain or database workloads. This
+    # causes all database workloads to be shutdown before domain workload,
+    # with TEs being shutdown before SMs. This has no effect if the domain
+    # or database is not disabled.
+    shouldShutdownGracefully: True
+  # FQDN for the endpoint used by the external SQL clients
+  sqlHostname: string
+  # Additional configuration for the Helm release
+  template:
+    # The backoff duration in seconds after failed helm install/upgrade. The
+    # total backoff interval will be multiplied by the number of failures.
+    backOffSec: 60
+    # Defines what happens with the persistent volume claims after the Helm
+    # release is uninstalled. Defaults to 'Delete' which means that all
+    # associated PVCs are removed.
+    dataRetentionPolicy: Delete
+    # Maximum number of retries that should be attempted on failures before
+    # giving up. Defaults to 20. Set to negative number to disable retries.
+    maxRetries: 20
+    # The target namespace to install the Helm release in
+    namespace: default
+    # The name of the Helm release
+    releaseName: string
+  # The Transport Layer Security (TLS) configuration for the domain and all
+  # databases that are part of it.
+  tls:
+    # The key in the Secret that provides the Certificate Authority (CA) X509
+    # certificate bundle that has signed the NuoDB Admin server key and used by
+    # the NuoDB Admin REST clients. Leave it empty if a public CA has been
+    # used.
+    caCertKey: ca.cert
+    # The key in the Secret that provides the certificate and private key in
+    # PEM format used by the NuoDB Admin REST clients.
+    clientCertKey: nuocmd.pem
+    # Automatically generate and provision the TLS keys in the configured
+    # Secret reference.
+    generate:
+      # The configuration for the NuoDBControlPlane provider
+      nuodbConfig:
+        # KeyStrength is the strength of the generated key.
+        keyStrength: MEDIUM
+        # KeyType is the asymmetric encryption algorithm for the generated
+        # key-pair.
+        keyType: RSA
+        # RenewBeforeExpiration defines how long before the currently issued TLS
+        # keys's expiry, they need to be renewed. Defaults to 1/3 of the
+        # certificates validity or max 7 days before expiration.
+        renewBeforeExpiration: 1d
+        # RenewPasswords indicates whether the Java keystore passwords must be
+        # changed along with the certificates. Changing the passwords requires
+        # NuoAdmin restart when TLS certificates are rotated.
+        renewPasswords: true
+        # Validity is the lifetime of the server certificate. Defaults to 1 year.
+        # The parsed duration is rounded up to number of days. Minimum accepted
+        # duration is 1 day.
+        validity: 1d
+      # The TLS configuration provider.
+      provider: NUODB_CP
+    # The key in the Secret that provides the contents of the Java keystore
+    # file.
+    keystoreKey: nuoadmin.p12
+    # The key in the Secret that provides the password for the Java keystore.
+    keystorePasswordKey: keystorePassword
+    # SecretRef is a reference to the location of the Secret providing the
+    # domain TLS configuration.
+    secretRef:
+      # Name of the referent
+      name: secret
+    # The key in the Secret that provides the contents of the Java truststore
+    # file.
+    truststoreKey: nuoadmin-truststore.p12
+    # The key in the Secret that provides the password for the Java truststore.
+    truststorePasswordKey: truststorePassword
+  # Domain instance service type
+  type:
+    # The service instance SLA type
+    sla: prod
+    # The service instance tier type
+    tierRef:
+      # Features that override the service tier Helm values for this resource.
+      featureOverrides:
+      -
+        # The name of the resource.
+        name: string
+        # The namespace of the resource. When not specified, the current
+        # namespace is assumed.
+        namespace: default
+        # Revision of the Helm feature used by this revision of the service tier.
+        revision: string
+      # The name of the resource.
+      name: tier
+      # The namespace of the resource. When not specified, the current
+      # namespace is assumed.
+      namespace: default
+      # Opaque parameters passed to the Helm features of the referenced service
+      # tier.
+      parameters:
+        {}
+      # Revision of the service tier.
+      revision: string
+  # NuoDB image version used for the domain
+  version: 7.0.2
+# Current observed status of the Domain.
+status:
+  # Components holds information about the observed status of the Domain
+  # components
+  components:
+    # NuoDB Admin component status information.
+    admins:
+    -
+      # Group defines the schema of this representation of an object.
+      group: string
+      # Kind is a string value representing the REST resource this object represents.
+      kind: string
+      # A human readable message indicating details about why the resource is in
+      # this condition
+      message: string
+      # Name is the resource
+      name: string
+      # ReadyReplicas is the number of pods created for this resource with a
+      # Ready Condition.
+      readyReplicas: 1
+      # Replicas is the number of pods created by the resource controller.
+      replicas: 1
+      # The state of the resource
+      state: string
+      # Version defines the schema version of this representation of an object.
+      version: 7.0.2
+    # Last update timestamp for this status.
+    lastUpdateTime: 2025-11-11T21:30:40.971508Z
+  # Conditions holds the conditions for the Domain.
+  conditions:
+  -
+    # lastTransitionTime is the last time the condition transitioned from one status to another.
+    # This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+    lastTransitionTime: 2025-11-11T21:30:40.971508Z
+    # message is a human readable message indicating details about the transition.
+    # This may be an empty string.
+    message: string
+    # observedGeneration represents the .metadata.generation that the condition was set based upon.
+    # For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+    # with respect to the current state of the instance.
+    observedGeneration: 1
+    # reason contains a programmatic identifier indicating the reason for the condition's last transition.
+    # Producers of specific condition types may define expected values and meanings for this field,
+    # and whether the values are considered a guaranteed API.
+    # The value should be a CamelCase string.
+    # This field may not be empty.
+    reason: string
+    # status of the condition, one of True, False, Unknown.
+    status: True
+    # type of condition in CamelCase or in foo.example.com/CamelCase.
+    type: string
+  # The last observed generation.
+  observedGeneration: 1
+  # ReleaseRefs contain references to the dependant HelmApp resources that
+  # have this object as an owner. Expected to be non-empty once the
+  # corresponding applications are installed.
+  releaseRefs:
+  -
+    # APIGroup is the group for the resource being referenced.
+    apiGroup: string
+    # Kind is the type of resource being referenced.
+    kind: string
+    # The revision of the last successful Helm release.
+    lastReleaseRevision: 1
+    # Name is the name of resource being referenced
+    name: string
+    # The name of the Helm release.
+    releaseName: string
+    # The target namespace of the Helm release.
+    releaseNamespace: string
+    # Whether the Helm release has been synchronized.
+    synced: true
+  # The observed NuoDB image version used for the domain.
+  version: 7.0.2
+```
