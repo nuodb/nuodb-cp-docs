@@ -5,7 +5,7 @@ summary: ""
 date: 2024-08-14T14:16:09+03:00
 lastmod: 2024-08-14T14:16:09+03:00
 draft: false
-weight: 300
+weight: 500
 toc: true
 sidebar:
   collapsed: true
