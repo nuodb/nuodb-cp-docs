@@ -15,8 +15,11 @@ seo:
 ---
 
 NuoDB DBaaS manages NuoDB databases at scale and automates certain aspects of the database lifecycle.
-A pre-defined database configuration preset in the form of [service tiers]({{< ref "./service-tiers.md" >}}) allows users to control fully supported and well-documented database properties.
-Such a reusable configuration provides convenience for the users, but requires extra planning when a configuration change is made, since this will affect many databases.
+[Service tiers]({{< ref "./service-tiers.md" >}}) are a small set of DBaaS administrator-managed, predefined database configuration profiles that expose fully supported and documented settings.
+Because these tiers are shared across many databases, any modification to a tier triggers a large number of resulting upgrades.
+A change in a service tier will be propagated immediately to all databases that reference this tier at the same time.
+This can be potentially disruptive even if the configuration change made is correct, and catastrophic if the change is incorrect.
+To manage this safely, cluster administrators control how these changes are rolled out, using canary deployment strategies to introduce updates gradually and with minimal risk.
 
 NuoDB DBaaS supports delivering configuration changes progressively to domain and database resources.
 This allows configuration updates to be delivered in a controlled way defined by NuoDBaaS operations best practices and enforced using rollout templates.
@@ -25,7 +28,7 @@ This allows configuration updates to be delivered in a controlled way defined by
 
 The `CanaryRollout` custom resource is a job for rolling out a change progressively to a group of `Domain` and `Database` resources.
 A [JSON merge patch](https://datatracker.ietf.org/doc/html/rfc7386) represents the desired configuration change to resources matched by a label selector.
-The canary rollout is either created automatically by the system, manually using `kubectl` or via REST API [/cluster/canaryrollouts](https://nuodb.github.io/nuodb-cp-releases/api-doc/#put-/cluster/canaryrollouts/-name-) cluster-scoped resource.
+The canary rollout is either created automatically by the system, manually using `kubectl`, or via REST API [/cluster/canaryrollouts](https://nuodb.github.io/nuodb-cp-releases/api-doc/#put-/cluster/canaryrollouts/-name-) cluster-scoped resource.
 
 ## Canary rollout template
 
@@ -54,7 +57,7 @@ Multiple analysis runs may be defined globally and executed after each _promote_
 
 ### Pause step
 
-The _pause_ step defines the duration for which the canary rollout must be paused.
+The _pause_ step defines the duration for which the canary rollout will be paused.
 A zero (0) duration pause the rollout until it is manually approved.
 
 To manually resume a paused canary rollout, update the `Paused` condition reason to `CanaryManuallyApproved` using `kubectl` directly or through the REST API.
@@ -106,7 +109,7 @@ An example canary rollout execution log is available below.
 ```text
 LAST SEEN   TYPE     REASON                       OBJECT                       MESSAGE
 22m         Normal   CanaryPauseStep              CanaryRollout/acme-upgrade   Pause step (1/13) activated: canary rollout paused until manual approval
-21m         Normal   CanaryManuallyApproved       CanaryRollout/acme-upgrade   Pause step (1/13) manually approved after -1h59m59.509203822s
+21m         Normal   CanaryManuallyApproved       CanaryRollout/acme-upgrade   Pause step (1/13) manually approved after 55s
 21m         Normal   Progressing                  CanaryRollout/acme-upgrade   Step (1/13) completed
 21m         Normal   CanaryPromoteStep            CanaryRollout/acme-upgrade   Promote step (2/13) progressing target Domain default/acme-messaging
 21m         Normal   CanaryPromoteStep            CanaryRollout/acme-upgrade   Promote step (2/13) progressing target Database default/acme-messaging-demo
@@ -130,7 +133,9 @@ Since canary rollouts may run for an extended time before completion, it is reco
 
 ## Use cases
 
-The canary rollout resources are the main building blocks for delivering any change progressively; however, let's focus on two main use cases described in this section.
+The canary rollout resources are the main building blocks for delivering any change to multiple Kubernetes resources progressively.
+A typical use case is updating the version of sorftware deliverables such as NuoDB product or Helm chart version, configuration revision or a combination of these.
+This section describes different approaches to utilize canary rollouts in your NuoDB DBaaS deployments.
 
 ### Changes in service tiers
 
