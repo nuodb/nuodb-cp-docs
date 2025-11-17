@@ -40,7 +40,7 @@ If any of the steps fail, the canary rollout is stopped and marked as failed.
 
 ### Promote step
 
-The _promote_ step defines the target resources to which a change is promoted in parallel and the rollback behaviour in case of failed analysis.
+The [promote step]({{< ref "../../reference/cp.nuodb.com.md#promotetorolloutstep" >}}) defines the target resources to which a change is promoted in parallel and the rollback behaviour in case of failed analysis.
 Various selectors and filters limit the promoted targets, such as label selector, number of targets, percentage of total targets, etc.
 
 {{< callout context="note" title="Note" icon="outline/info-circle" >}}
@@ -50,14 +50,14 @@ For a change to be propagated to a specific target, the target must match one of
 
 ### Analysis step
 
-The analysis step defines the type of analysis run to be performed on target resources after a change has been rolled out.
+The [analysis step]({{< ref "../../reference/cp.nuodb.com.md#canaryrolloutanalysis" >}}) defines the type of analysis run to be performed on target resources after a change has been rolled out.
 An analysis run is executed in parallel on all targets promoted from the last _promote_ step.
 If at least one analysis run fails for some of the targets, the canary rollout is stopped.
 Multiple analysis runs may be defined globally and executed after each _promote_ step.
 
 ### Pause step
 
-The _pause_ step defines the duration for which the canary rollout will be paused.
+The [pause step]({{< ref "../../reference/cp.nuodb.com.md#pauserolloutstep" >}}) defines the duration for which the canary rollout will be paused.
 A zero (0) duration pause the rollout until it is manually approved.
 
 To manually resume a paused canary rollout, update the `Paused` condition reason to `CanaryManuallyApproved` using `kubectl` directly or through the REST API.
