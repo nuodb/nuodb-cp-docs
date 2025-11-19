@@ -160,7 +160,7 @@ The diagram below illustrates a successful automatic configuration rollout trigg
 The example is simplified and has one Helm feature, one service tier, and two databases for demonstration purposes.
 Multiple controllers in the NuoDB operator are responsible for progressively rolling out the change in the Helm feature to both databases.
 
-{{< figure src="canary-success-flow.png" caption="Figure 1. Canary rollout success flow" >}}
+{{< figure src="canary-success-flow.png" caption="Figure 1. Canary rollout success flow" alt="Canary rollout success flow" >}}
 
 In case the analysis defined in the `CanaryRolloutTemplate` fails for one or more target databases, the rollout will stop, and the impacted databases will be rolled back to the previous service tier revision.
 
@@ -169,7 +169,7 @@ Depending on the canary template configuration, multiple databases may be update
 By default, a rollback will be performed only for the databases with failed analysis.
 {{< /callout >}}
 
-{{< figure src="canary-rollback-flow.png" caption="Figure 2. Canary rollout rollback flow" >}}
+{{< figure src="canary-rollback-flow.png" caption="Figure 2. Canary rollout rollback flow" alt="Canary rollout rollback flow" >}}
 
 ### Example: Service tier rollout
 
