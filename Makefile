@@ -19,7 +19,7 @@ CP_CLIDOC_FILE := https://github.com/nuodb/nuodb-cp-releases/releases/download/v
 
 # NuoDB Control Plane Git repository and revision
 CP_REPO ?= github.com/nuodb/nuodb-control-plane
-CP_REPO_DIR := $(GIT_BASE)/$(CP_REPO)
+CP_REPO_DIR ?= $(GIT_BASE)/$(CP_REPO)
 CP_COMMIT ?= v$(CP_VERSION)
 
 # Tools used by various targets
