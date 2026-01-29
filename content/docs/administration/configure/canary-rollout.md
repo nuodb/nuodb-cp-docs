@@ -26,13 +26,13 @@ This allows configuration updates to be delivered in a controlled way defined by
 
 ## Canary rollout
 
-The `CanaryRollout` custom resource is a job for rolling out a change progressively to a group of `Domain` and `Database` resources.
+The [CanaryRollout]({{< ref "../../reference/samples/cp.nuodb.com_canaryrollout.md" >}}) custom resource is a job for rolling out a change progressively to a group of `Domain` and `Database` resources.
 A [JSON merge patch](https://datatracker.ietf.org/doc/html/rfc7386) represents the desired configuration change to resources matched by a label selector.
 The canary rollout is either created automatically by the system, manually using `kubectl`, or via REST API [/cluster/canaryrollouts](https://nuodb.github.io/nuodb-cp-releases/api-doc/#put-/cluster/canaryrollouts/-name-) cluster-scoped resource.
 
 ## Canary rollout template
 
-The `CanaryRolloutTemplate` custom resource is a reusable configuration defining the rollout strategy.
+The [CanaryRolloutTemplate]({{< ref "../../reference/samples/cp.nuodb.com_canaryrollouttemplate.md" >}}) custom resource is a reusable configuration defining the rollout strategy.
 It is referenced by a `CanaryRollout` resource, and together they describe how a specific configuration change is delivered to selected targets.
 
 Each template defines steps executed sequentially.
@@ -129,6 +129,27 @@ The current state for pending analysis runs is recorded for each promoted target
 
 {{< callout context="note" title="Note" icon="outline/info-circle" >}}
 Since canary rollouts may run for an extended time before completion, it is recommended to collect and store Kubernetes events in an external system (e.g., Grafana Loki) for long-term storage.
+{{< /callout >}}
+
+## Restart rollout
+
+Canary rollout execution can be suspended by setting `.spec.suspended=true`.
+Once a suspended rollout is resumed, it will continue from the current step that was executing before.
+
+If the desired configuration (i.e. `.spec`) for an active canary rollout is changed, it will restart, and its progress will be reset.
+All targets that were patched previously will be evaluated against the current `.spec.patch` field and are promoted only if the patch led to changes in the resources.
+Otherwise, targets with no changes will be skipped.
+
+{{< callout context="note" title="Note" icon="outline/info-circle" >}}
+A completed canary rollout must be recreated.
+Use the below command to preserve the spec and recreate the canary rollout.
+
+```sh
+canary="<name>"
+resource="$(kubectl get canaryrollout $canary \
+  -o json | jq -r 'del(.status, .metadata.annotations["kubectl.kubernetes.io/last-applied-configuration"])')"
+[ -n "$resource" ] && kubectl delete canaryrollout $canary && echo "$resource" | kubectl apply -f -
+```
 {{< /callout >}}
 
 ## Use cases
