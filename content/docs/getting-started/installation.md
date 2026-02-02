@@ -105,6 +105,25 @@ Self-signed certificates should be used for local testing purposes only.
 For more information on how to configure Nginx controller with TLS, see [Ingress Nginx TLS User Guide](https://github.com/kubernetes/ingress-nginx/blob/main/docs/user-guide/tls.md).
 {{< /callout >}}
 
+## Obtain NuoDB license
+
+The installation of either a Limited Use License or an Enterprise License is required to create and start NuoDB databases.
+For more information on NuoDB licenses, see [NuoDB Product Licenses](https://doc.nuodb.com/nuodb/latest/introduction-to-nuodb/#_nuodb_product_licenses).
+To obtain the license file required to enable deployment of the Limited Use License or the Enterprise License, contact [NuoDB Support](mailto:NuoDB.Support@3ds.com).
+
+The contents of NuoDB license files have following form:
+
+```text
+-----BEGIN LICENSE-----
+<base64-encoded data>
+-----END LICENSE-----
+```
+
+{{< callout context="note" title="Note" icon="outline/info-circle" >}}
+Set the path to the NuoDB license file using `export LICENSE_FILE=</path/to/nuodb.lic>`.
+The environment variable is used in the NuoDB Control Plane installation commands.
+{{< /callout >}}
+
 ## Installing NuoDB Control Plane
 
 The NuoDB Control Plane consists of [Custom Resource Definitions][5] and the following workloads:
@@ -138,6 +157,10 @@ helm upgrade --install nuodb-cp-operator nuodb-cp/nuodb-cp-operator \
     --namespace nuodb-cp-system \
     --wait \
     --set cpOperator.webhooks.enabled=true \
+    --set nuodb-cp-config.nuodb.license.enabled=true \
+    --set nuodb-cp-config.nuodb.license.secret.create=true \
+    --set nuodb-cp-config.nuodb.license.secret.name=nuodb-license \
+    --set nuodb-cp-config.nuodb.license.content="$(cat ${LICENSE_FILE})" \
     --set 'cpOperator.extraArgs[0]=--ingress-https-port=8443' # Enables connecting to databases with port-forwarding
 ```
 
