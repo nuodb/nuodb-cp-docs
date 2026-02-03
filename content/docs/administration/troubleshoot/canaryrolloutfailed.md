@@ -20,15 +20,13 @@ Canary rollout has failed.
 
 {{< details "Full context" open >}}
 A change delivered using a progressive rollout has failed to be enforced on some of the targets.
-The canary rollout completed with failure either because the delivered change was incorrect or the configured analysis has failed.
+The canary rollout completed with failure either because the delivered change was incorrect or a configured analysis has failed.
 For more information on progressive rollouts, see [Rollout Configuration Changes]({{< ref "../configure/canary-rollout.md" >}}).
 {{< /details >}}
 
 ### Symptom
 
-To manually evaluate the conditions for this alert, follow the steps below.
-
-A failed canary rollout will have the `Ready` status condition set to `False` and `Complete` status condition set to `True`.
+A failed canary rollout will have the `Ready` status condition set to `False` and the `Complete` status condition set to `True`.
 List all failed canary rollouts.
 
 ```sh
@@ -44,7 +42,7 @@ kubectl get canaryrollout <name> -o jsonpath='{.status.conditions[?(@.type=="Rea
 
 ## Impact
 
-The decired change delivered by the canary is not enforced on some targets.
+The desired change delivered by the canary was not enforced on some targets.
 Inspect the `.spec.patch` field to determine if this is a configuration change or NuoDB product version upgrade.
 Changes in the service tiers are typically delivered via canary rollouts by updating the tier revision number (e.g. `{"spec":{"type":{"tierRef":{"revision":"2"}}}}`).
 
@@ -160,7 +158,7 @@ kubectl get events  | grep te-acme-messaging-drive-fbd7bd9 | grep Warning
 ```
 
 The error above indicates not enough CPU available in the cluster to schedule the TE pod.
-We suspect that the performed change might have bumped the CPU requests which was fine for the first two databases but eventually the cluster capacity was exhausted.
+This could mean that the performed change has bumped the CPU requests which was fine for the first two databases but eventually the cluster capacity was exhausted.
 
 #### Inspect service tier change
 

@@ -134,14 +134,14 @@ Since canary rollouts may run for an extended time before completion, it is reco
 ## Restart rollout
 
 Canary rollout execution can be suspended by setting `.spec.suspended=true`.
-Once a suspended rollout is resumed, it will continue from the current step that was executing before.
+Once a suspended rollout is resumed, it will continue from the step executing when it was suspended.
 
 If the desired configuration (i.e. `.spec`) for an active canary rollout is changed, it will restart, and its progress will be reset.
-All targets that were patched previously will be evaluated against the current `.spec.patch` field and are promoted only if the patch led to changes in the resources.
+All targets that were patched previously will be evaluated against the current `.spec.patch` and are promoted only if the new patch leads to additional changes.
 Otherwise, targets with no changes will be skipped.
 
 {{< callout context="note" title="Note" icon="outline/info-circle" >}}
-A completed canary rollout must be recreated.
+If a canary rollout needs to be modified or rerun after it completed, the canary rollout resource must be recreated.
 Use the below command to preserve the spec and recreate the canary rollout.
 
 ```sh
