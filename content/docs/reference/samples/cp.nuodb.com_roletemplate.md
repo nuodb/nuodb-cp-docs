@@ -3,7 +3,7 @@ title: "RoleTemplate"
 description: "A sample RoleTemplate object with fields documented"
 summary: ""
 draft: false
-weight: 962
+weight: 963
 toc: true
 seo:
   title: "" # custom title (optional)

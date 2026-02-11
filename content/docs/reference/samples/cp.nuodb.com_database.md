@@ -70,6 +70,29 @@ metadata:
 spec:
   # ArchiveVolume configures the database archive volume.
   archiveVolume:
+    # Resize the volume automatically when a threshold is reached. The volume
+    # storage class must support volume expansion.
+    automaticResize:
+      # Determines the new size of the volume. By default the volume size will be
+      # increased by 20%. If maxSize is set, then the new volume size will be
+      # evaluated as the minimum of maxSize and result of applying the growth
+      # configuration.
+      growth:
+        # Increase the volume size by a constant number of bytes.
+        increment: 5Gi
+        # Increase the volume size by a factor of the current size. Valid are
+        # values between 1.01 and 9.99.
+        scale: string
+      # The maximum volume size.
+      maxSize: 5Gi
+      # The threshold at which the volume will be expanded.
+      threshold:
+        # Threshold in number of available bytes at which volume expansion is
+        # performed.
+        bytesAvailable: 5Gi
+        # Threshold in percentage of available disk space at which volume expansion
+        # is performed.
+        percentageAvailable: 1
     # DataSourceRef specifies the object from which to populate the volume with
     # data, if a non-empty volume is desired. An existing VolumeSnapshot object
     # (snapshot.storage.k8s.io/VolumeSnapshot) or an existing PVC
@@ -119,6 +142,29 @@ spec:
   # JournalVolume configures the database external journal volume. If
   # defined, a separate volume for the database journal will be provisioned.
   journalVolume:
+    # Resize the volume automatically when a threshold is reached. The volume
+    # storage class must support volume expansion.
+    automaticResize:
+      # Determines the new size of the volume. By default the volume size will be
+      # increased by 20%. If maxSize is set, then the new volume size will be
+      # evaluated as the minimum of maxSize and result of applying the growth
+      # configuration.
+      growth:
+        # Increase the volume size by a constant number of bytes.
+        increment: 5Gi
+        # Increase the volume size by a factor of the current size. Valid are
+        # values between 1.01 and 9.99.
+        scale: string
+      # The maximum volume size.
+      maxSize: 5Gi
+      # The threshold at which the volume will be expanded.
+      threshold:
+        # Threshold in number of available bytes at which volume expansion is
+        # performed.
+        bytesAvailable: 5Gi
+        # Threshold in percentage of available disk space at which volume expansion
+        # is performed.
+        percentageAvailable: 1
     # DataSourceRef specifies the object from which to populate the volume with
     # data, if a non-empty volume is desired. An existing VolumeSnapshot object
     # (snapshot.storage.k8s.io/VolumeSnapshot) or an existing PVC

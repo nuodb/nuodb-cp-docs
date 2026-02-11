@@ -148,6 +148,9 @@ status:
     kind: string
     # Name is the name of resource being referenced
     name: string
+    # Namespace is the namespace of resource being referenced. If empty, the
+    # namespace of the referee is used instead.
+    namespace: default
   # The generation observed by the controller from metadata.generation.
   observedGeneration: 1
 ```

@@ -32,9 +32,26 @@ Package v1beta1 contains API Schema definitions for the cp v1beta1 API group
 - [IdentityProvider](#identityprovider)
 - [Metric](#metric)
 - [MetricSource](#metricsource)
+- [PersistentVolumeRebinding](#persistentvolumerebinding)
 - [RoleTemplate](#roletemplate)
 - [ServiceTier](#servicetier)
 
+
+
+#### APISelector
+
+
+
+An API selector is a query over a set of resources.
+
+
+
+_Appears in:_
+- [PromoteToRolloutStep](#promotetorolloutstep)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `matchGroupKinds` _string array_ | A list of GroupKind string elements formatted as "<kind>.<API group>". |  |  |
 
 
 #### AccessRuleEntry
@@ -251,6 +268,7 @@ _Appears in:_
 | `executionDeadlineSeconds` _integer_ | Optional deadline in seconds for executing this analaysis. Analysis runs<br />that exceed the specified deadline are interrupted and retried later.<br />Defaults to 60s. |  | Minimum: 1 <br /> |
 | `runOnDisabled` _boolean_ | Run the analysis on disabled targets. By default the analysis is skipped<br />on disabled resources. |  |  |
 | `checkStatusCondition` _[StatusConditionAnalysis](#statusconditionanalysis)_ | Check for a certain status condition. |  |  |
+| `checkFieldValue` _[FieldValueAnalysis](#fieldvalueanalysis)_ | Check for expected field value on the target resource. |  |  |
 
 
 #### CanaryRolloutSpec
@@ -310,6 +328,7 @@ _Appears in:_
 | `apiGroup` _string_ | APIGroup is the group for the resource being referenced. |  |  |
 | `kind` _string_ | Kind is the type of resource being referenced. |  |  |
 | `name` _string_ | Name is the name of resource being referenced |  |  |
+| `namespace` _string_ | Namespace is the namespace of resource being referenced. If empty, the<br />namespace of the referee is used instead. |  |  |
 | `analysisRun` _[CanaryAnalysisRunInfo](#canaryanalysisruninfo) array_ | Information about performed analysis run against the target. |  |  |
 
 
@@ -709,6 +728,43 @@ _Appears in:_
 
 
 
+#### DirectPersistentVolumeRebinding
+
+
+
+
+
+
+
+_Appears in:_
+- [DirectPersistentVolumeRebindingWithStatus](#directpersistentvolumerebindingwithstatus)
+- [PersistentVolumeRebindingEntry](#persistentvolumerebindingentry)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `sourceClaim` _string_ | The name of the existing PVC in the source namespace. |  |  |
+| `targetClaim` _string_ | The name of the PVC to create in the target namespace. |  |  |
+
+
+#### DirectPersistentVolumeRebindingWithStatus
+
+
+
+
+
+
+
+_Appears in:_
+- [PersistentVolumeRebindingStatus](#persistentvolumerebindingstatus)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `sourceClaim` _string_ | The name of the existing PVC in the source namespace. |  |  |
+| `targetClaim` _string_ | The name of the PVC to create in the target namespace. |  |  |
+| `persistentVolume` _string_ | The name of the cluster-scoped PersistentVolume resource being rebound. |  |  |
+| `message` _string_ | A human-readable message that describes the status. |  |  |
+
+
 #### Domain
 
 
@@ -768,6 +824,42 @@ _Appears in:_
 | `maintenance` _[MaintenanceConfig](#maintenanceconfig)_ | The maintenance configuration for the domain. |  |  |
 
 
+
+
+#### FieldValueAnalysis
+
+
+
+FieldValueAnalysis requires a certain field value on the target resource.
+
+
+
+_Appears in:_
+- [CanaryRolloutAnalysis](#canaryrolloutanalysis)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `fieldPath` _string_ | The field's JSONPath to perform analysis on. |  |  |
+| `values` _string array_ | The values to compare to the extracted value. The condition is satisfied<br />if any of the values match the extracted value. |  |  |
+| `timeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | A timeout after which an analysis is declared as failed. |  | Pattern: `^([0-9]+(\.[0-9]+)?(ns\|us\|µs\|ms\|s\|m\|h))+$` <br />Type: string <br /> |
+
+
+#### FullyQualifiedDatabaseName
+
+
+
+
+
+
+
+_Appears in:_
+- [TemplateClaim](#templateclaim)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `organization` _string_ | The name of the organization. |  |  |
+| `project` _string_ | The name of the project. |  |  |
+| `database` _string_ | The name of the database. |  |  |
 
 
 #### HelmApp
@@ -1362,6 +1454,7 @@ _Appears in:_
 | `volumeSize` _[Quantity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#quantity-resource-api)_ | VolumeSize is the storage resource request, in bytes (e,g. 5Gi = 5GiB = 5<br />* 1024 * 1024 * 1024) |  |  |
 | `storageClassName` _string_ | StorageClassName is the name of the StorageClass required for this<br />volume. |  |  |
 | `dataSourceRef` _[TypedObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#typedobjectreference-v1-core)_ | DataSourceRef specifies the object from which to populate the volume with<br />data, if a non-empty volume is desired. An existing VolumeSnapshot object<br />(snapshot.storage.k8s.io/VolumeSnapshot) or an existing PVC<br />(PersistentVolumeClaim) are supported. |  |  |
+| `automaticResize` _[VolumeResizeConfig](#volumeresizeconfig)_ | Resize the volume automatically when a threshold is reached. The volume<br />storage class must support volume expansion. |  |  |
 
 
 #### PersistentVolumeClaimRetentionPolicy
@@ -1379,6 +1472,62 @@ _Appears in:_
 | --- | --- |
 | `Delete` | PersistentVolumeClaimRetentionDelete means the persistent volume claims<br />will be deleted after the release is uninstalled. The associated<br />persistent volume retention is controlled separately.<br /> |
 | `Retain` | PersistentVolumeClaimRetentionRetain means the persistent volume claims<br />will be left in their current state for manual removal by the<br />administrator. The associated persistent volume retention is controlled<br />separately.<br /> |
+
+
+#### PersistentVolumeRebinding
+
+
+
+PersistentVolumeRebinding is the Schema for the persistentvolumerebindings API.
+
+[Example]({{< ref "samples/cp.nuodb.com_persistentvolumerebinding.md" >}})
+
+
+
+
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `apiVersion` _string_ | `cp.nuodb.com/v1beta1` | | |
+| `kind` _string_ | `PersistentVolumeRebinding` | | |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `spec` _[PersistentVolumeRebindingSpec](#persistentvolumerebindingspec)_ |  |  |  |
+
+
+#### PersistentVolumeRebindingEntry
+
+
+
+
+
+
+
+_Appears in:_
+- [PersistentVolumeRebindingSpec](#persistentvolumerebindingspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `direct` _[DirectPersistentVolumeRebinding](#directpersistentvolumerebinding)_ | If specified, rebinds a PVC in the source namespace to a PVC in the<br />target namespace. The source namespace is the namespace of the<br />PersistentVolumeRebinding resource, while the target namespace is the<br />namespace that the controller reconciling the<br />PersistentVolumeRebinding resource is running in. |  |  |
+| `template` _[TemplatePersistentVolumeRebinding](#templatepersistentvolumerebinding)_ | If specified, rebinds of a set of PVCs in the source namespace to a<br />set of PVCs in the target namespace. The source namespace is the<br />namespace of the PersistentVolumeRebinding resource, while the target<br />namespace is the namespace that the controller reconciling the<br />PersistentVolumeRebinding resource is running in. |  |  |
+
+
+#### PersistentVolumeRebindingSpec
+
+
+
+PersistentVolumeRebindingSpec defines the desired state of PersistentVolumeRebinding.
+
+
+
+_Appears in:_
+- [PersistentVolumeRebinding](#persistentvolumerebinding)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `targetClaimLabels` _object (keys:string, values:string)_ | Labels to specify on target PVC resources created by this<br />PersistentVolumeRebinding resource. |  |  |
+| `rebindings` _[PersistentVolumeRebindingEntry](#persistentvolumerebindingentry) array_ | The rebindings to perform. |  | MaxItems: 20 <br />MinItems: 1 <br /> |
+
+
 
 
 #### PrometheusMetric
@@ -1432,6 +1581,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `labelSelector` _[LabelSelector](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#labelselector-v1-meta)_ | A label query over resources to which promotion is performed. It must<br />match the resource labels. The label selector requirements are ANDed with<br />those defined in the canary rollout selector. |  |  |
+| `apiSelector` _[APISelector](#apiselector)_ | An API query over resources to which promotion is performed. It must<br />match the APIGroup and Kind of the resource. If no selector is defined,<br />no additional filtering is performed. |  |  |
 | `limitCount` _integer_ | Limit the promotion to certain number of the matching resources. The<br />supplied limit is cumulative across promote steps (i.e. total number of<br />targets to be promoted). |  | Minimum: 1 <br /> |
 | `limitPercentage` _integer_ | Limit the promotion to certain percentage of the matching resources. The<br />supplied limit is cumulative across promote steps (i.e. total percentage<br />of targets to be promoted). |  | Maximum: 100 <br />Minimum: 1 <br /> |
 | `rollback` _[RollbackOptions](#rollbackoptions)_ | Actions performed on failed analysis. No automatic rollback is performed<br />by default. |  |  |
@@ -1514,6 +1664,8 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `lastEnforced` _[QuotaEnforcementRecord](#quotaenforcementrecord) array_ | The information about objects on which this quota has been enforced.<br />It is cleared by the quota controller after a successful<br />reconciliation. |  |  |
 | `observedGeneration` _integer_ | The last observed generation. |  |  |
+
+
 
 
 #### ReleaseInfo
@@ -1866,6 +2018,41 @@ _Appears in:_
 | `generate` _[TlsGenerateConfig](#tlsgenerateconfig)_ | Automatically generate and provision the TLS keys in the configured<br />Secret reference. |  |  |
 
 
+#### TemplateClaim
+
+
+
+
+
+
+
+_Appears in:_
+- [TemplatePersistentVolumeRebinding](#templatepersistentvolumerebinding)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `dbaasDatabaseArchive` _[FullyQualifiedDatabaseName](#fullyqualifieddatabasename)_ | If specified, defines the PVCs to be the archive PVCs for SMs in the<br />supplied database. |  |  |
+| `dbaasDatabaseJournal` _[FullyQualifiedDatabaseName](#fullyqualifieddatabasename)_ | If specified, defines the PVCs to be the journal PVCs for SMs in the<br />supplied database. |  |  |
+| `prefix` _string_ | If specified, defines the PVCs to have the supplied prefix with<br />ordinal suffixes. |  |  |
+
+
+#### TemplatePersistentVolumeRebinding
+
+
+
+
+
+
+
+_Appears in:_
+- [PersistentVolumeRebindingEntry](#persistentvolumerebindingentry)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `sourceClaim` _[TemplateClaim](#templateclaim)_ | The definition of a set of PVCs in the source namespace. |  |  |
+| `targetClaim` _[TemplateClaim](#templateclaim)_ | The definition of a set of PVCs in the target namespace. |  |  |
+
+
 #### TierUpdateStrategy
 
 
@@ -1999,7 +2186,6 @@ typed referenced object inside the same namespace.
 
 
 _Appears in:_
-- [CanaryRolloutTargetReference](#canaryrollouttargetreference)
 - [QuotaEnforcementRecord](#quotaenforcementrecord)
 - [ReleaseReference](#releasereference)
 
@@ -2008,6 +2194,26 @@ _Appears in:_
 | `apiGroup` _string_ | APIGroup is the group for the resource being referenced. |  |  |
 | `kind` _string_ | Kind is the type of resource being referenced. |  |  |
 | `name` _string_ | Name is the name of resource being referenced |  |  |
+
+
+#### TypedObjectReference
+
+
+
+TypedObjectReference contains enough information to let you locate the typed
+referenced object in any namespace.
+
+
+
+_Appears in:_
+- [CanaryRolloutTargetReference](#canaryrollouttargetreference)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `apiGroup` _string_ | APIGroup is the group for the resource being referenced. |  |  |
+| `kind` _string_ | Kind is the type of resource being referenced. |  |  |
+| `name` _string_ | Name is the name of resource being referenced |  |  |
+| `namespace` _string_ | Namespace is the namespace of resource being referenced. If empty, the<br />namespace of the referee is used instead. |  |  |
 
 
 #### Validate
@@ -2134,6 +2340,58 @@ _Appears in:_
 | `kind` _string_ | Kind of the values referent, valid values are ('Secret', 'ConfigMap'). |  | Enum: [Secret ConfigMap] <br /> |
 | `name` _string_ | Name of the values referent. Should reside in the same namespace as the<br />referring resource. |  | MaxLength: 253 <br />MinLength: 1 <br /> |
 | `dataKey` _string_ | DataKey is the data key where the a specific value can be<br />found at. Defaults to "data" | data |  |
+
+
+#### VolumeResizeConfig
+
+
+
+VolumeResizeConfig defines volume automatic resize configuration
+
+
+
+_Appears in:_
+- [PersistentStorage](#persistentstorage)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `threshold` _[VolumeResizeThreshold](#volumeresizethreshold)_ | The threshold at which the volume will be expanded. |  |  |
+| `growth` _[VolumeResizeGrowth](#volumeresizegrowth)_ | Determines the new size of the volume. By default the volume size will be<br />increased by 20%. If maxSize is set, then the new volume size will be<br />evaluated as the minimum of maxSize and result of applying the growth<br />configuration. |  |  |
+| `maxSize` _[Quantity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#quantity-resource-api)_ | The maximum volume size. |  |  |
+
+
+#### VolumeResizeGrowth
+
+
+
+VolumeResizeGrowth defines the volume growth configuration.
+
+
+
+_Appears in:_
+- [VolumeResizeConfig](#volumeresizeconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `increment` _[Quantity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#quantity-resource-api)_ | Increase the volume size by a constant number of bytes. |  |  |
+| `scale` _string_ | Increase the volume size by a factor of the current size. Valid are<br />values between 1.01 and 9.99. |  | Pattern: `^(1[.]([0-9][1-9]\|[1-9][0-9]?)\|[2-9]([.][0-9]\{1,2\})?)$` <br /> |
+
+
+#### VolumeResizeThreshold
+
+
+
+VolumeResizeThreshold defines threshold at which the volume resize kicks in.
+
+
+
+_Appears in:_
+- [VolumeResizeConfig](#volumeresizeconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `bytesAvailable` _[Quantity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#quantity-resource-api)_ | Threshold in number of available bytes at which volume expansion is<br />performed. |  |  |
+| `percentageAvailable` _integer_ | Threshold in percentage of available disk space at which volume expansion<br />is performed. |  | ExclusiveMaximum: true <br />ExclusiveMinimum: true <br />Maximum: 100 <br />Minimum: 0 <br /> |
 
 
 #### WorkloadStatus

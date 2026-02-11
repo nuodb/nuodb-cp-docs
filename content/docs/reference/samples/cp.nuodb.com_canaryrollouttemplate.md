@@ -53,6 +53,16 @@ spec:
   # Analysis performed after every promotion step.
   analysis:
   -
+    # Check for expected field value on the target resource.
+    checkFieldValue:
+      # The field's JSONPath to perform analysis on.
+      fieldPath: string
+      # A timeout after which an analysis is declared as failed.
+      timeout: 1d
+      # The values to compare to the extracted value. The condition is satisfied
+      # if any of the values match the extracted value.
+      values:
+      - string
     # Check for a certain status condition.
     checkStatusCondition:
       # The required condition status.
@@ -80,6 +90,16 @@ spec:
   -
     # Run analysis.
     analysis:
+      # Check for expected field value on the target resource.
+      checkFieldValue:
+        # The field's JSONPath to perform analysis on.
+        fieldPath: string
+        # A timeout after which an analysis is declared as failed.
+        timeout: 1d
+        # The values to compare to the extracted value. The condition is satisfied
+        # if any of the values match the extracted value.
+        values:
+        - string
       # Check for a certain status condition.
       checkStatusCondition:
         # The required condition status.
@@ -106,6 +126,13 @@ spec:
       duration: 1d
     # Promote the change to group of targets.
     promoteTo:
+      # An API query over resources to which promotion is performed. It must
+      # match the APIGroup and Kind of the resource. If no selector is defined,
+      # no additional filtering is performed.
+      apiSelector:
+        # A list of GroupKind string elements formatted as "<kind>.<API group>".
+        matchGroupKinds:
+        - string
       # A label query over resources to which promotion is performed. It must
       # match the resource labels. The label selector requirements are ANDed with
       # those defined in the canary rollout selector.

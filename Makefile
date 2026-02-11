@@ -19,7 +19,7 @@ PROJECT_DIR := $(shell pwd)
 DOCS_DIR := $(PROJECT_DIR)/content/docs
 
 # NuoDB CP release packages
-CP_VERSION ?= 2.9.2
+CP_VERSION ?= 2.11.0
 CP_CLIDOC := nuodb-cp.adoc
 CP_CLIDOC_FILE := https://github.com/nuodb/nuodb-cp-releases/releases/download/v$(CP_VERSION)/$(CP_CLIDOC)
 
