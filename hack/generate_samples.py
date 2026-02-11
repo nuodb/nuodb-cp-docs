@@ -178,7 +178,11 @@ REQUIRED_FIELDS = {
     'HelmFeature' : ['spec.values'],
     'Metric' : ['spec.metrics'],
     'ServiceTier' : ['spec.features'],
-    'PersistentVolumeRebinding': ['spec.rebindings.template', 'spec.rebindings.template.sourceClaim.dbaasDatabaseArchive', 'spec.rebindings.template.targetClaim.dbaasDatabaseArchive']
+    'PersistentVolumeRebinding': [
+        'spec.rebindings.template',
+        'spec.rebindings.template.sourceClaim.dbaasDatabaseArchive',
+        'spec.rebindings.template.targetClaim.dbaasDatabaseArchive'
+    ],
 }
 
 def write_schema(schema, kind=None, indent=2, minimal=False, field_name=None, field_path=None):
