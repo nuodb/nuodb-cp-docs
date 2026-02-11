@@ -36,6 +36,7 @@ CRD_DOCS_VERSION ?= 0.2.0
 
 VENV := .venv
 VENV_ACTIVATE := $(VENV)/bin/activate
+PYTHON := $(VENV)/bin/python3
 
 ##@ General
 
@@ -93,7 +94,7 @@ generate-crd-samples: $(CP_REPO_DIR) pip-install # Generate CRD samples
 		git -C $(CP_REPO_DIR) fetch --all ;\
 	fi
 	git -C $(CP_REPO_DIR) checkout $(CP_COMMIT)
-	hack/generate_samples.py --source-dir $(CP_REPO_DIR)/operator/config/crd/bases \
+	$(PYTHON) hack/generate_samples.py --source-dir $(CP_REPO_DIR)/operator/config/crd/bases \
 		--start-weight 950 \
 		--output-dir $(DOCS_DIR)/reference/samples
 
