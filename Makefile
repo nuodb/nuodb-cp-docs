@@ -34,6 +34,9 @@ CRD_DOCS = bin/crd-ref-docs
 # Tool Versions
 CRD_DOCS_VERSION ?= 0.2.0
 
+VENV := .venv
+VENV_ACTIVATE := $(VENV)/bin/activate
+
 ##@ General
 
 # The help target prints out all targets with their descriptions organized
@@ -85,7 +88,7 @@ generate-crd-docs: $(CRD_DOCS) $(CP_REPO_DIR) generate-crd-samples # Generates C
 			"Custom resource definitions (CRDs) for NuoDB Control Plane operator" "912"
 
 .PHONY: generate-crd-samples
-generate-crd-samples: $(CP_REPO_DIR) # Generate CRD samples
+generate-crd-samples: $(CP_REPO_DIR) pip-install # Generate CRD samples
 	@if [ $(CP_REPO_FETCH) = "true" ]; then \
 		git -C $(CP_REPO_DIR) fetch --all ;\
 	fi
@@ -93,6 +96,16 @@ generate-crd-samples: $(CP_REPO_DIR) # Generate CRD samples
 	hack/generate_samples.py --source-dir $(CP_REPO_DIR)/operator/config/crd/bases \
 		--start-weight 950 \
 		--output-dir $(DOCS_DIR)/reference/samples
+
+.PHONY: pip-install
+pip-install: $(VENV)
+	. $(VENV_ACTIVATE) && pip install -r hack/requirements.txt
+
+$(VENV):
+	python3 -m venv $(VENV) --clear --upgrade-deps
+
+$(VENV)/bin/%:
+	$(MAKE) pip-install
 
 # Targets for downloading tools used by other targets
 ifeq ($(shell uname -m), $(filter $(shell uname -m), arm64 aarch64))
