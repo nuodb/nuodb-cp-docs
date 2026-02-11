@@ -30,6 +30,34 @@ spec:
   # The rebindings to perform.
   rebindings:
   -
+    # If specified, rebinds of a set of PVCs in the source namespace to a
+    # set of PVCs in the target namespace. The source namespace is the
+    # namespace of the PersistentVolumeRebinding resource, while the target
+    # namespace is the namespace that the controller reconciling the
+    # PersistentVolumeRebinding resource is running in.
+    template:
+      # The definition of a set of PVCs in the source namespace.
+      sourceClaim:
+        # If specified, defines the PVCs to be the archive PVCs for SMs in the
+        # supplied database.
+        dbaasDatabaseArchive:
+          # The name of the database.
+          database: string
+          # The name of the organization.
+          organization: string
+          # The name of the project.
+          project: string
+      # The definition of a set of PVCs in the target namespace.
+      targetClaim:
+        # If specified, defines the PVCs to be the archive PVCs for SMs in the
+        # supplied database.
+        dbaasDatabaseArchive:
+          # The name of the database.
+          database: string
+          # The name of the organization.
+          organization: string
+          # The name of the project.
+          project: string
 ```
 
 ## Extended example
