@@ -8,6 +8,12 @@ else
 GOBIN=$(shell go env GOBIN)
 endif
 
+# Fetch the NuoDB CP repository only if CP_REPO_DIR is not defined
+CP_REPO_FETCH := true
+ifdef CP_REPO_DIR
+CP_REPO_FETCH := false
+endif
+
 # Define the project directory
 PROJECT_DIR := $(shell pwd)
 DOCS_DIR := $(PROJECT_DIR)/content/docs
@@ -64,7 +70,10 @@ generate-cli-docs: # Generates reference pages for nuodb-cp CLI tool
 
 .PHONY: generate-crd-docs
 generate-crd-docs: $(CRD_DOCS) $(CP_REPO_DIR) generate-crd-samples # Generates CRDs reference pages
-	cd $(CP_REPO_DIR) && git fetch --all && git checkout $(CP_COMMIT) && cd -
+	@if [ $(CP_REPO_FETCH) = "true" ]; then \
+		git -C $(CP_REPO_DIR) fetch --all ;\
+	fi
+	git -C $(CP_REPO_DIR) checkout $(CP_COMMIT)
 	$(CRD_DOCS) --source-path=$(CP_REPO_DIR)/operator/api/v1beta1 \
 		--config=.crdrefdocs.yaml \
 		--renderer=markdown \
@@ -77,7 +86,10 @@ generate-crd-docs: $(CRD_DOCS) $(CP_REPO_DIR) generate-crd-samples # Generates C
 
 .PHONY: generate-crd-samples
 generate-crd-samples: $(CP_REPO_DIR) # Generate CRD samples
-	cd $(CP_REPO_DIR) && git fetch --all && git checkout $(CP_COMMIT) && cd -
+	@if [ $(CP_REPO_FETCH) = "true" ]; then \
+		git -C $(CP_REPO_DIR) fetch --all ;\
+	fi
+	git -C $(CP_REPO_DIR) checkout $(CP_COMMIT)
 	hack/generate_samples.py --source-dir $(CP_REPO_DIR)/operator/config/crd/bases \
 		--start-weight 950 \
 		--output-dir $(DOCS_DIR)/reference/samples
