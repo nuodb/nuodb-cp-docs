@@ -3,7 +3,7 @@ title: "ServiceTier"
 description: "A sample ServiceTier object with fields documented"
 summary: ""
 draft: false
-weight: 963
+weight: 964
 toc: true
 seo:
   title: "" # custom title (optional)
