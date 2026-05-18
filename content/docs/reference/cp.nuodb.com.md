@@ -2356,7 +2356,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `threshold` _[VolumeResizeThreshold](#volumeresizethreshold)_ | The threshold at which the volume will be expanded. |  |  |
-| `growth` _[VolumeResizeGrowth](#volumeresizegrowth)_ | Determines the new size of the volume. By default the volume size will be<br />increased by 20%. If maxSize is set, then the new volume size will be<br />evaluated as the minimum of maxSize and result of applying the growth<br />configuration. |  |  |
+| `growth` _[VolumeResizeGrowth](#volumeresizegrowth)_ | Determines the new size of the volume. By default the volume size will be<br />increased by 20% (or minimum of 1Gi). If maxSize is set, then the new<br />volume size will be evaluated as the minimum of maxSize and result of<br />applying the growth configuration. |  |  |
 | `maxSize` _[Quantity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#quantity-resource-api)_ | The maximum volume size. |  |  |
 
 
@@ -2373,7 +2373,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `increment` _[Quantity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#quantity-resource-api)_ | Increase the volume size by a constant number of bytes. |  |  |
+| `increment` _[Quantity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#quantity-resource-api)_ | Increase the volume size by a constant number of bytes. Minimum accepted<br />increment is 1Gi. |  |  |
 | `scale` _string_ | Increase the volume size by a factor of the current size. Valid are<br />values between 1.01 and 9.99. |  | Pattern: `^(1[.]([0-9][1-9]\|[1-9][0-9]?)\|[2-9]([.][0-9]\{1,2\})?)$` <br /> |
 
 
