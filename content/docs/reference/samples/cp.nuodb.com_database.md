@@ -74,11 +74,12 @@ spec:
     # storage class must support volume expansion.
     automaticResize:
       # Determines the new size of the volume. By default the volume size will be
-      # increased by 20%. If maxSize is set, then the new volume size will be
-      # evaluated as the minimum of maxSize and result of applying the growth
-      # configuration.
+      # increased by 20% (or minimum of 1Gi). If maxSize is set, then the new
+      # volume size will be evaluated as the minimum of maxSize and result of
+      # applying the growth configuration.
       growth:
-        # Increase the volume size by a constant number of bytes.
+        # Increase the volume size by a constant number of bytes. Minimum accepted
+        # increment is 1Gi.
         increment: 5Gi
         # Increase the volume size by a factor of the current size. Valid are
         # values between 1.01 and 9.99.
@@ -146,11 +147,12 @@ spec:
     # storage class must support volume expansion.
     automaticResize:
       # Determines the new size of the volume. By default the volume size will be
-      # increased by 20%. If maxSize is set, then the new volume size will be
-      # evaluated as the minimum of maxSize and result of applying the growth
-      # configuration.
+      # increased by 20% (or minimum of 1Gi). If maxSize is set, then the new
+      # volume size will be evaluated as the minimum of maxSize and result of
+      # applying the growth configuration.
       growth:
-        # Increase the volume size by a constant number of bytes.
+        # Increase the volume size by a constant number of bytes. Minimum accepted
+        # increment is 1Gi.
         increment: 5Gi
         # Increase the volume size by a factor of the current size. Valid are
         # values between 1.01 and 9.99.
