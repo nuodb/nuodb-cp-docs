@@ -101,6 +101,26 @@ status:
   components:
     # Last update timestamp for this status.
     lastUpdateTime: 2025-11-11T21:30:40.971508Z
+    # Services define the observed status for all Service resources installed
+    # by this HelmApp.
+    services:
+    -
+      # Endpoints is the number healthy Pods that match the Service's
+      # requirements
+      endpoints: 1
+      # Group defines the schema of this representation of an object.
+      group: string
+      # Kind is a string value representing the REST resource this object represents.
+      kind: string
+      # A human readable message indicating details about why the resource is in
+      # this condition
+      message: string
+      # Name is the resource
+      name: string
+      # The state of the resource
+      state: string
+      # Version defines the schema version of this representation of an object.
+      version: 7.0.2
     # Workloads define the observed status for all statefulsets and deployments
     # installed by this HelmApp.
     workloads:

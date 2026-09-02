@@ -11,7 +11,7 @@ seo:
   canonical: "" # custom canonical URL (optional)
   noindex: false # false (default) or true
 ---
-:revnumber: 2.12.2
+:revnumber: 2.13.0
 :toc: left
 
 [#nuodb-cp]

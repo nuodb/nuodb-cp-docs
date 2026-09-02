@@ -158,6 +158,7 @@ BaseResourceStatus defines the observed state of an installed resource
 
 
 _Appears in:_
+- [ServiceStatus](#servicestatus)
 - [WorkloadStatus](#workloadstatus)
 
 | Field | Description | Default | Validation |
@@ -896,6 +897,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `workloads` _[WorkloadStatus](#workloadstatus) array_ | Workloads define the observed status for all statefulsets and deployments<br />installed by this HelmApp. |  |  |
+| `services` _[ServiceStatus](#servicestatus) array_ | Services define the observed status for all Service resources installed<br />by this HelmApp. |  |  |
 | `lastUpdateTime` _[Time](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#time-v1-meta)_ | Last update timestamp for this status. |  |  |
 
 
@@ -1859,6 +1861,28 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `name` _string_ | The name of the Secret resource to obtain the value from. |  | MinLength: 1 <br /> |
 | `key` _string_ | The key of the value within the Secret resource. |  | MinLength: 1 <br /> |
+
+
+#### ServiceStatus
+
+
+
+ServiceStatus defines the observed state of a Service
+
+
+
+_Appears in:_
+- [HelmAppComponentsStatus](#helmappcomponentsstatus)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `name` _string_ | Name is the resource |  |  |
+| `kind` _string_ | Kind is a string value representing the REST resource this object represents. |  |  |
+| `version` _string_ | Version defines the schema version of this representation of an object. |  |  |
+| `group` _string_ | Group defines the schema of this representation of an object. |  |  |
+| `state` _string_ | The state of the resource |  |  |
+| `message` _string_ | A human readable message indicating details about why the resource is in<br />this condition |  |  |
+| `endpoints` _integer_ | Endpoints is the number healthy Pods that match the Service's<br />requirements |  |  |
 
 
 #### ServiceTier
