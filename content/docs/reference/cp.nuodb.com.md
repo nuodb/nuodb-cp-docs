@@ -1380,6 +1380,8 @@ _Appears in:_
 
 
 
+
+
 #### OidcSpec
 
 
@@ -2167,9 +2169,10 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `from` _string_ | The value to transform. If `regex` is `true`, this is interpreted as<br />a regular expression that is matched against the input value.<br />Otherwise, this is interpreted as a literal string that is compared<br />fully to the input value. If the `from` value does not match the<br />input value, then this transformation has no effect. |  |  |
-| `to` _string_ | The value to transform to. If `regex` is `true`, this may contain<br />references to capturing groups appearing in the `from` value,<br />otherwise it is just the literal output value. |  |  |
+| `to` _string_ | The value to transform to. If `regex` is `true`, this may contain<br />references to capturing groups appearing in the `from` value. If<br />`template` is `true`, this is interpreted as a Pebble template evaluated<br />against a context of the actual `value` and all capturing groups in case<br />`regex` is also `true`. Otherwise it is just the literal output value. |  |  |
 | `regex` _boolean_ | Whether to interpret `from` as a regular expression. |  |  |
 | `global` _boolean_ | Whether to apply transformation to all matches of the regular<br />expression. If `global` is `true`, this transformation will be<br />applied to all occurrences of `from` within the current value. If<br />`global` is `false` or omitted, this transformation will be applied<br />to the first occurrence only. |  |  |
+| `template` _boolean_ | Whether to interpret `to` as a Pebble template. |  |  |
 | `strategy` _[TransformStrategy](#transformstrategy)_ |  |  | Enum: [Compose ShortCircuit] <br /> |
 
 

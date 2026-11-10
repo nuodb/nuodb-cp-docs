@@ -161,9 +161,13 @@ spec:
         # `Compose` being used when `regex` is `true` and `ShortCircuit` being used
         # when `regex` is `false` or omitted.
         strategy: Compose
+        # Whether to interpret `to` as a Pebble template.
+        template: true
         # The value to transform to. If `regex` is `true`, this may contain
-        # references to capturing groups appearing in the `from` value,
-        # otherwise it is just the literal output value.
+        # references to capturing groups appearing in the `from` value. If
+        # `template` is `true`, this is interpreted as a Pebble template evaluated
+        # against a context of the actual `value` and all capturing groups in case
+        # `regex` is also `true`. Otherwise it is just the literal output value.
         to: string
       # If specified, the value to use.
       value: string
@@ -204,9 +208,13 @@ spec:
         # `Compose` being used when `regex` is `true` and `ShortCircuit` being used
         # when `regex` is `false` or omitted.
         strategy: Compose
+        # Whether to interpret `to` as a Pebble template.
+        template: true
         # The value to transform to. If `regex` is `true`, this may contain
-        # references to capturing groups appearing in the `from` value,
-        # otherwise it is just the literal output value.
+        # references to capturing groups appearing in the `from` value. If
+        # `template` is `true`, this is interpreted as a Pebble template evaluated
+        # against a context of the actual `value` and all capturing groups in case
+        # `regex` is also `true`. Otherwise it is just the literal output value.
         to: string
       # If specified, the value to use.
       value: string
@@ -249,9 +257,13 @@ spec:
         # `Compose` being used when `regex` is `true` and `ShortCircuit` being used
         # when `regex` is `false` or omitted.
         strategy: Compose
+        # Whether to interpret `to` as a Pebble template.
+        template: true
         # The value to transform to. If `regex` is `true`, this may contain
-        # references to capturing groups appearing in the `from` value,
-        # otherwise it is just the literal output value.
+        # references to capturing groups appearing in the `from` value. If
+        # `template` is `true`, this is interpreted as a Pebble template evaluated
+        # against a context of the actual `value` and all capturing groups in case
+        # `regex` is also `true`. Otherwise it is just the literal output value.
         to: string
       # If specified, the value to use.
       value: string
@@ -308,9 +320,13 @@ spec:
         # `Compose` being used when `regex` is `true` and `ShortCircuit` being used
         # when `regex` is `false` or omitted.
         strategy: Compose
+        # Whether to interpret `to` as a Pebble template.
+        template: true
         # The value to transform to. If `regex` is `true`, this may contain
-        # references to capturing groups appearing in the `from` value,
-        # otherwise it is just the literal output value.
+        # references to capturing groups appearing in the `from` value. If
+        # `template` is `true`, this is interpreted as a Pebble template evaluated
+        # against a context of the actual `value` and all capturing groups in case
+        # `regex` is also `true`. Otherwise it is just the literal output value.
         to: string
 # Current observed status of the IdentityProvider.
 status:
