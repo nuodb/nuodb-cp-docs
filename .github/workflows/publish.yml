@@ -42,7 +42,7 @@ jobs:
         run: sudo snap install dart-sass
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.4.7
+          ruby-version: 3.4.12
       - name: Install asciidoctor
         uses: reitzig/actions-asciidoctor@v2.0.2
         with:
